@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 export const Ruler = () => {
   // TODO: implement mousedown and mousemove to update time and Playhead position
 
@@ -12,3 +14,5 @@ export const Ruler = () => {
     </div>
   );
 };
+
+export const RulerMemoed = memo(Ruler);

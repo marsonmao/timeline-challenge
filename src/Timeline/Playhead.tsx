@@ -1,8 +1,9 @@
-type PlayheadProps = {
-  time: number;
-};
+import { memo, useContext } from "react";
+import { TimelineContext } from "./TimelineContext";
 
-export const Playhead = ({ time }: PlayheadProps) => {
+export const Playhead = () => {
+  const { time } = useContext(TimelineContext);
+
   return (
     <div
       className="absolute left-[316px] h-full border-l-2 border-solid border-yellow-600 z-10"
@@ -13,3 +14,5 @@ export const Playhead = ({ time }: PlayheadProps) => {
     </div>
   );
 };
+
+export const PlayheadMemoed = memo(Playhead);

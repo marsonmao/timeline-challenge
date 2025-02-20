@@ -1,18 +1,16 @@
-import React, { useCallback } from "react";
+import React, { memo, useCallback, useContext } from "react";
+import { TimelineContext } from "./TimelineContext";
 
-type PlayControlsProps = {
-  time: number;
-  setTime: (time: number) => void;
-};
-
-export const PlayControls = ({ time, setTime }: PlayControlsProps) => {
+export const PlayControls = () => {
   // TODO: implement time <= maxTime
+
+  const { time, setTime } = useContext(TimelineContext);
 
   const onTimeChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setTime(Number(e.target.value));
     },
-    [setTime],
+    [setTime]
   );
 
   return (
@@ -50,3 +48,5 @@ export const PlayControls = ({ time, setTime }: PlayControlsProps) => {
     </div>
   );
 };
+
+export const PlayControlsMemoed = memo(PlayControls);
