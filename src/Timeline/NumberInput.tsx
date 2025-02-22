@@ -23,13 +23,13 @@ export type NumberInputProps = {
     Change local value only
     1. type in the input
 
-    Report to onChange
+    Report to onChange (confirm local value)
     1. press enter
     2. click outside (blur)
     3. click on the spinners
 
     Revert to initial value
-    1. press escape
+    1. press escape (blur)
 */
 export function NumberInput({
   value,
