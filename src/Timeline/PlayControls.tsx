@@ -1,16 +1,23 @@
 import { memo, useContext } from "react";
-import { TimeInput } from "./TimeInput";
+import { NumberInput, validateNumber } from "./NumberInput";
 import { RenderTracker } from "./RenderTracker";
 import { TimelineContext } from "./TimelineContext";
 
-const config = {
+const currentTimeConfig = {
   /**
    * In unit of Milliseconds
    */
-  timeStep: 10,
-  minStartTime: 0,
-  minEndTime: 100,
-  maxEndTime: 2000,
+  step: 10,
+  min: 0,
+};
+
+const durationTimeConfig = {
+  /**
+   * In unit of Milliseconds
+   */
+  step: 10,
+  min: 100,
+  max: 6000,
 };
 
 export const PlayControls = () => {
@@ -27,17 +34,15 @@ export const PlayControls = () => {
       >
         <fieldset className="flex gap-1">
           Current
-          <TimeInput
+          <NumberInput
             value={globalTime}
             onChange={setGlobalTime}
             data-testid="current-time-input"
-            min={config.minStartTime}
-            max={config.maxEndTime} // TODO dynamic, should be the current duration
-            step={config.timeStep}
+            validator={validateNumber}
             config={{
-              timeStep: config.timeStep,
-              minTime: config.minStartTime,
-              maxTime: config.maxEndTime, // TODO dynamic, should be the current duration
+              step: currentTimeConfig.step,
+              min: currentTimeConfig.min,
+              max: 2000, // TODO should be the current duration and defined in a Context
             }}
           />
         </fieldset>
@@ -48,10 +53,10 @@ export const PlayControls = () => {
             className="bg-gray-700 px-1 rounded"
             type="number"
             data-testid="duration-input"
-            min={config.minEndTime}
-            max={config.maxEndTime}
-            step={config.timeStep}
-            defaultValue={config.maxEndTime}
+            min={durationTimeConfig.min}
+            max={durationTimeConfig.max}
+            step={durationTimeConfig.step}
+            defaultValue={durationTimeConfig.max}
           />
           Duration
         </fieldset>

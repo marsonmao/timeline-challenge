@@ -1,24 +1,36 @@
 import React, { useCallback, useRef } from "react";
 
+export type NumberConfig = {
+  step: number;
+  min: number;
+  max: number;
+};
+
+export function validateNumber(rawTime: number, config: NumberConfig): number {
+  let time = Math.round(rawTime / config.step) * config.step;
+  if (Number.isNaN(rawTime) || rawTime === -Infinity) {
+    time = config.min;
+  } else if (time === Infinity) {
+    time = config.max;
+  }
+  return Math.min(config.max, Math.max(config.min, time));
+}
+
 export type NumberInputProps = {
   value: number;
   onChange: (value: number) => void;
-  validator: (rawValue: number) => number;
-} & Pick<
-  React.InputHTMLAttributes<HTMLInputElement>,
-  "min" | "max" | "step"
-> & {
-    // TODO extract to a separate type
-    [key: `data-${string}`]: string | number | boolean | undefined;
-  };
+  validator: (rawTime: number, config: NumberConfig) => number;
+  config: NumberConfig;
+} & {
+  // TODO extract to a separate type
+  [key: `data-${string}`]: string | number | boolean | undefined;
+};
 
 export function NumberInput({
   value,
   onChange,
-  min,
-  max,
-  step,
   validator,
+  config,
   ...rest
 }: NumberInputProps) {
   const inputElement = useRef<HTMLInputElement>(null);
@@ -36,7 +48,7 @@ export function NumberInput({
   const handleValueChange = useCallback(
     (localValue: string) => {
       const rawValue = parseFloat(localValue);
-      const validatedValue = validator(rawValue);
+      const validatedValue = validator(rawValue, config);
       onChange(validatedValue);
       setLocalValue(validatedValue.toString());
     },
@@ -139,9 +151,9 @@ export function NumberInput({
       className="bg-gray-700 px-1 rounded"
       type="number"
       ref={inputElement}
-      min={min}
-      max={max}
-      step={step}
+      min={config.min}
+      max={config.max}
+      step={config.step}
       value={inputValue}
       onChange={handleChange}
       onFocus={handleFocus}
