@@ -68,7 +68,8 @@ export const PlayControls = () => {
     selectInputText();
   }, []);
 
-  const onInputBlur = useCallback(() => {
+  const onInputBlur = () => {
+    console.log({ a: blurTriggerKey.current });
     if (blurTriggerKey.current === "Escape") {
       setInputTime(globalTime);
     } else if (
@@ -80,7 +81,7 @@ export const PlayControls = () => {
 
     setIsEditingTime(false);
     blurTriggerKey.current = null;
-  }, []);
+  };
 
   const onInputKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
