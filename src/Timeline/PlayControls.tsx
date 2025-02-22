@@ -133,7 +133,7 @@ export const PlayControls = () => {
     []
   );
 
-  const timeInputValue = isEditingTime ? inputTime : globalTime;
+  const timeInputValue = (isEditingTime ? inputTime : globalTime).toString();
 
   return (
     <>
