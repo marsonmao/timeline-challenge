@@ -1,4 +1,4 @@
-import { NumberInput, type NumberInputProps } from "./NumberInput";
+import { NumberInput, NumberInputProps } from "./NumberInput";
 
 export type TimeConfig = {
   timeStep: number;
@@ -19,7 +19,7 @@ export function validateTime(
   return Math.min(config.maxEndTime, Math.max(config.minEndTime, time));
 }
 
-export type CurrentTimeInputProps = {config:TimeConfig}&Omit<NumberInputProps, "validateTime">;
+export type CurrentTimeInputProps = {config:TimeConfig}&Omit<NumberInputProps, "validator">;
 
 export const CurrentTimeInput = ({
   value,
@@ -31,7 +31,7 @@ export const CurrentTimeInput = ({
     <NumberInput
       value={value}
       onChange={onChange}
-      validateTime={(rawTime) => validateTime(rawTime, config)}
+      validator={(rawTime) => validateTime(rawTime, config)}
       min={0}
       max={config.maxEndTime}
       step={config.timeStep}

@@ -3,7 +3,7 @@ import React, { useCallback, useRef } from "react";
 export type NumberInputProps = {
   value: number;
   onChange: (value: number) => void;
-  validateTime: (rawTime: number) => number;
+  validator: (rawValue: number) => number;
 } & Pick<
   React.InputHTMLAttributes<HTMLInputElement>,
   "min" | "max" | "step"
@@ -20,15 +20,15 @@ export type NumberInputProps = {
     2. click on the spinners
     3. tab
 
-    Change local time only
+    Change local value only
     1. type in the input
 
-    Change global time directly
+    Report to onChange
     1. press enter
     2. click outside (blur)
     3. click on the spinners
 
-    Revert to global time
+    Revert to initial value
     1. press escape
 */
 export function NumberInput({
@@ -37,13 +37,13 @@ export function NumberInput({
   min,
   max,
   step,
-  validateTime,
+  validator,
   ...rest
 }: NumberInputProps) {
   const inputElement = useRef<HTMLInputElement>(null);
-  const [isEditingTime, setIsEditingTime] = React.useState(false);
+  const [isEditing, setIsEditing] = React.useState(false);
   const valueString = value.toString(); // Remove leading zeroes
-  const [inputTime, setInputTime] = React.useState<string>(valueString);
+  const [localValue, setLocalValue] = React.useState<string>(valueString);
   const isSpinnerClicked = useRef(false);
   const isArrowKeyDown = useRef(false);
   const blurTriggerKey = useRef<string | null>(null);
@@ -52,46 +52,46 @@ export function NumberInput({
     inputElement.current?.select();
   }, []);
 
-  const handleTimeChange = useCallback((inputTime: string) => {
-    const rawValue = parseFloat(inputTime);
-    const validatedValue = validateTime(rawValue);
+  const handleValueChange = useCallback((localValue: string) => {
+    const rawValue = parseFloat(localValue);
+    const validatedValue = validator(rawValue);
     onChange(validatedValue);
-    setInputTime(validatedValue.toString());
-  }, []);
+    setLocalValue(validatedValue.toString());
+  }, [onChange]);
 
-  const onInputChange = useCallback(
+  const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (isSpinnerClicked.current || isArrowKeyDown.current) {
-        handleTimeChange(e.target.value);
+        handleValueChange(e.target.value);
         selectInputText();
       } else {
-        setInputTime(e.target.value);
+        setLocalValue(e.target.value);
         // TODO make invalid text red
       }
     },
-    [selectInputText, handleTimeChange]
+    [selectInputText, handleValueChange]
   );
 
-  const onInputFocus = useCallback(() => {
-    setIsEditingTime(true);
+  const handleFocus = useCallback(() => {
+    setIsEditing(true);
     selectInputText();
   }, [selectInputText]);
 
-  const onInputBlur = () => {
+  const handleBlur = () => {
     if (blurTriggerKey.current === "Escape") {
-      setInputTime(valueString);
+      setLocalValue(valueString);
     } else if (
       blurTriggerKey.current === "Enter" ||
       blurTriggerKey.current === null
     ) {
-      handleTimeChange(inputTime);
+      handleValueChange(localValue);
     }
 
-    setIsEditingTime(false);
+    setIsEditing(false);
     blurTriggerKey.current = null;
   };
 
-  const onInputKeyDown = useCallback(
+  const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       /**
        * If any key is pressed, it would break the spinner event chain, so we clear the flag.
@@ -108,17 +108,17 @@ export function NumberInput({
     []
   );
 
-  const onInputKeyUp = useCallback(
+  const handleKeyUp = useCallback(
     (_e: React.KeyboardEvent<HTMLInputElement>) => {
       isArrowKeyDown.current = false;
     },
     []
   );
 
-  const onInputMouseDown = useCallback(
+  const handleMouseDown = useCallback(
     (_e: React.MouseEvent<HTMLInputElement>) => {
       /**
-       * The goal is to change the global time when the spinners are clicked.
+       * The goal is to report to onChange when the spinners are clicked.
        *
        * However, we cannot know if they are clicked due to the limitation of browser implementation.
        * The browser can only tell us that the input element was clicked, but it could be any pixel.
@@ -134,14 +134,14 @@ export function NumberInput({
     []
   );
 
-  const onInputMouseUp = useCallback(
+  const handleMouseUp = useCallback(
     (_e: React.MouseEvent<HTMLInputElement>) => {
       isSpinnerClicked.current = false;
     },
     []
   );
 
-  const timeInputValue = isEditingTime ? inputTime : valueString;
+  const inputValue = isEditing ? localValue : valueString;
 
   return (
     <input
@@ -152,14 +152,14 @@ export function NumberInput({
       min={min}
       max={max}
       step={step}
-      value={timeInputValue}
-      onChange={onInputChange}
-      onFocus={onInputFocus}
-      onBlur={onInputBlur}
-      onKeyDown={onInputKeyDown}
-      onKeyUp={onInputKeyUp}
-      onMouseDown={onInputMouseDown}
-      onMouseUp={onInputMouseUp}
+      value={inputValue}
+      onChange={handleChange}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
+      onKeyUp={handleKeyUp}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
     />
   );
 }
