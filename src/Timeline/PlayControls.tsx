@@ -1,5 +1,5 @@
 import { memo, useContext } from "react";
-import { CurrentTimeInput } from "./CurrentTimeInput";
+import { TimeInput } from "./TimeInput";
 import { RenderTracker } from "./RenderTracker";
 import { TimelineContext } from "./TimelineContext";
 
@@ -27,7 +27,7 @@ export const PlayControls = () => {
       >
         <fieldset className="flex gap-1">
           Current
-          <CurrentTimeInput
+          <TimeInput
             value={globalTime}
             onChange={setGlobalTime}
             data-testid="current-time-input"

@@ -16,17 +16,17 @@ export function validateTime(rawTime: number, config: TimeConfig): number {
   return Math.min(config.maxTime, Math.max(config.minTime, time));
 }
 
-export type CurrentTimeInputProps = { config: TimeConfig } & Omit<
+export type TimeInputProps = { config: TimeConfig } & Omit<
   NumberInputProps,
   "validator"
 >;
 
-export const CurrentTimeInput = ({
+export const TimeInput = ({
   value,
   onChange,
   config,
   ...rest
-}: CurrentTimeInputProps) => {
+}: TimeInputProps) => {
   return (
     <NumberInput
       value={value}
