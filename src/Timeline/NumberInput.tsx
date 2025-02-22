@@ -12,25 +12,6 @@ export type NumberInputProps = {
     [key: `data-${string}`]: string | number | boolean | undefined;
   };
 
-/**
-    How this component work:
-
-    Entry (focus)
-    1. click on the input area
-    2. click on the spinners
-    3. tab
-
-    Change local value only
-    1. type in the input
-
-    Report to onChange (confirm local value)
-    1. press enter
-    2. click outside (blur)
-    3. click on the spinners
-
-    Revert to initial value
-    1. press escape (blur)
-*/
 export function NumberInput({
   value,
   onChange,
