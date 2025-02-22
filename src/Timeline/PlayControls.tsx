@@ -45,7 +45,7 @@ export const PlayControls = () => {
   const [inputTime, setInputTime] = React.useState(globalTime);
   const isSpinnerClicked = useRef(false);
   const isArrowKeyDown = useRef(false);
-  const blurTriggerKey = useRef<string|null>(null);
+  const blurTriggerKey = useRef<string | null>(null);
 
   const selectInputText = () => {
     inputElement.current?.select();
@@ -104,14 +104,14 @@ export const PlayControls = () => {
     (_e: React.MouseEvent<HTMLInputElement>) => {
       /**
        * The goal is to change the global time when the spinners are clicked.
-       * 
+       *
        * However, we cannot know if they are clicked due to the limitation of browser implementation.
        * The browser can only tell us that the input element was clicked, but it could be any pixel.
-       * 
+       *
        * The workaround is to detect a chain of consecutive events: [mouse down, change].
        * When a spinner was clicked, it would form this event chain.
-       * 
-       * So that in this handler, we firstly set the flag to true, 
+       *
+       * So that in this handler, we firstly set the flag to true,
        * and then we check if the chain is formed in the other handlers.
        */
       isSpinnerClicked.current = true;
