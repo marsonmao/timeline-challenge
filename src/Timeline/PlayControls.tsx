@@ -1,18 +1,28 @@
-import React, { memo, useCallback, useContext } from "react";
-import { TimelineContext } from "./TimelineContext";
+import { memo, useContext } from "react";
+import { NumberInput, validateNumber } from "./NumberInput";
 import { RenderTracker } from "./RenderTracker";
+import { TimelineContext } from "./TimelineContext";
+
+const currentTimeConfig = {
+  /**
+   * In unit of Milliseconds
+   */
+  step: 10,
+  min: 0,
+};
+
+const durationTimeConfig = {
+  /**
+   * In unit of Milliseconds
+   */
+  step: 10,
+  min: 100,
+  max: 6000,
+};
 
 export const PlayControls = () => {
-  // TODO: implement time <= maxTime
-
-  const { time, setTime } = useContext(TimelineContext);
-
-  const onTimeChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setTime(Number(e.target.value));
-    },
-    [setTime]
-  );
+  const { time: globalTime, setTime: setGlobalTime } =
+    useContext(TimelineContext);
 
   return (
     <>
@@ -24,27 +34,29 @@ export const PlayControls = () => {
       >
         <fieldset className="flex gap-1">
           Current
-          <input
-            className="bg-gray-700 px-1 rounded"
-            type="number"
+          <NumberInput
+            value={globalTime}
+            onChange={setGlobalTime}
             data-testid="current-time-input"
-            min={0}
-            max={2000}
-            step={10}
-            value={time}
-            onChange={onTimeChange}
+            validator={validateNumber}
+            config={{
+              step: currentTimeConfig.step,
+              min: currentTimeConfig.min,
+              max: 2000, // TODO should be the current duration and defined in a Context
+            }}
           />
         </fieldset>
         -
         <fieldset className="flex gap-1">
+          {/* TODO create a DurationTimeInput */}
           <input
             className="bg-gray-700 px-1 rounded"
             type="number"
             data-testid="duration-input"
-            min={100}
-            max={2000}
-            step={10}
-            defaultValue={2000}
+            min={durationTimeConfig.min}
+            max={durationTimeConfig.max}
+            step={durationTimeConfig.step}
+            defaultValue={durationTimeConfig.max}
           />
           Duration
         </fieldset>

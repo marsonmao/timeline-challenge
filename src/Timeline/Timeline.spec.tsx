@@ -34,10 +34,11 @@ test("the components subscribed to the time state should render accordingly, whi
   expect(trackListRenderTracker.textContent).toBe("1");
   expect(keyframeListRenderTracker.textContent).toBe("1");
 
-  // After user input -- rendered 2 more times because user input 2 and 20 both rerender
+  await userEvent.click(currentTimeInput);
   await userEvent.type(currentTimeInput, "20");
-  expect(playControlsRenderTracker.textContent).toBe("3");
-  expect(playheadRenderTracker.textContent).toBe("3");
+  await userEvent.keyboard("{Enter}");
+  expect(playControlsRenderTracker.textContent).toBe("2");
+  expect(playheadRenderTracker.textContent).toBe("2");
   expect(rulerRenderTracker.textContent).toBe("1");
   expect(trackListRenderTracker.textContent).toBe("1");
   expect(keyframeListRenderTracker.textContent).toBe("1");
