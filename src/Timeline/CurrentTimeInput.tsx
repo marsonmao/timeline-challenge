@@ -6,10 +6,7 @@ export type TimeConfig = {
   maxTime: number;
 };
 
-export function validateTime(
-  rawTime: number,
-  config: TimeConfig
-): number {
+export function validateTime(rawTime: number, config: TimeConfig): number {
   let time = Math.round(rawTime / config.timeStep) * config.timeStep;
   if (Number.isNaN(rawTime) || rawTime === -Infinity) {
     time = config.minTime;
@@ -19,7 +16,10 @@ export function validateTime(
   return Math.min(config.maxTime, Math.max(config.minTime, time));
 }
 
-export type CurrentTimeInputProps = {config:TimeConfig}&Omit<NumberInputProps, "validator">;
+export type CurrentTimeInputProps = { config: TimeConfig } & Omit<
+  NumberInputProps,
+  "validator"
+>;
 
 export const CurrentTimeInput = ({
   value,
