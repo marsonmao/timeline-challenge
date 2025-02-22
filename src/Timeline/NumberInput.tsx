@@ -67,9 +67,13 @@ export function NumberInput({
       if (isSpinnerClicked.current || isArrowKeyDown.current) {
         handleValueChange(e.target.value);
         selectInputText();
-      } else if (e.target.value === "") {
-        setLocalValue(min?.toString() ?? "0");
-      } else {
+      }
+      // TODO this messes up the entering of "-" and "." etc.
+      // Need to find a better way to handle typing of e.g. A,B,C.
+      // else if (e.target.value === "") {
+      //   setLocalValue(min?.toString() ?? "0");
+      // }
+      else {
         setLocalValue(e.target.value);
         // TODO make invalid text red
       }
