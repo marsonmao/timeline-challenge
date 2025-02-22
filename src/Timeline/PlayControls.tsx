@@ -11,9 +11,13 @@ const config = {
   maxEndTime: 2000,
 };
 
-export function validateTime(time: number): number {
-  // TODO handle NaN
-  return Math.min(config.maxEndTime, Math.max(0, time));
+export function validateTime(rawTime: number): number {
+  let time = rawTime;
+  if (Number.isNaN(rawTime)) {
+    time = config.minEndTime;
+  }
+  // TODO round decimal values
+  return Math.min(config.maxEndTime, Math.max(config.minEndTime, time));
 }
 
 /**
@@ -36,13 +40,12 @@ export function validateTime(time: number): number {
     1. press escape
  */
 export const PlayControls = () => {
-  // TODO: implement time <= maxTime
-
   const inputElement = useRef<HTMLInputElement>(null);
   const [isEditingTime, setIsEditingTime] = React.useState(false);
   const { time: globalTime, setTime: setGlobalTime } =
     useContext(TimelineContext);
-  const [inputTime, setInputTime] = React.useState(globalTime);
+  const globalTimeString = globalTime.toString(); // Remove leading zeroes
+  const [inputTime, setInputTime] = React.useState<string>(globalTimeString);
   const isSpinnerClicked = useRef(false);
   const isArrowKeyDown = useRef(false);
   const blurTriggerKey = useRef<string | null>(null);
@@ -51,32 +54,39 @@ export const PlayControls = () => {
     inputElement.current?.select();
   }, []);
 
-  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = Number(e.target.value);
+  const setGlobalTimeAndSyncInputTime = useCallback((inputTime: string) => {
+    const rawValue = parseInt(inputTime, 10);
     const validatedValue = validateTime(rawValue);
+    setGlobalTime(validatedValue);
+    setInputTime(validatedValue.toString());
+  }, []);
 
-    if (isSpinnerClicked.current || isArrowKeyDown.current) {
-      setGlobalTime(validatedValue);
-      selectInputText();
-    }
-
-    setInputTime(validatedValue);
-  };
+  const onInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (isSpinnerClicked.current || isArrowKeyDown.current) {
+        setGlobalTimeAndSyncInputTime(e.target.value);
+        selectInputText();
+      } else {
+        setInputTime(e.target.value);
+        // TODO make invalid text red
+      }
+    },
+    [selectInputText, setGlobalTimeAndSyncInputTime]
+  );
 
   const onInputFocus = useCallback(() => {
     setIsEditingTime(true);
     selectInputText();
-  }, []);
+  }, [selectInputText]);
 
   const onInputBlur = () => {
-    console.log({ a: blurTriggerKey.current });
     if (blurTriggerKey.current === "Escape") {
-      setInputTime(globalTime);
+      setInputTime(globalTimeString);
     } else if (
       blurTriggerKey.current === "Enter" ||
       blurTriggerKey.current === null
     ) {
-      setGlobalTime(inputTime);
+      setGlobalTimeAndSyncInputTime(inputTime);
     }
 
     setIsEditingTime(false);
@@ -133,7 +143,7 @@ export const PlayControls = () => {
     []
   );
 
-  const timeInputValue = (isEditingTime ? inputTime : globalTime).toString();
+  const timeInputValue = isEditingTime ? inputTime : globalTimeString;
 
   return (
     <>
