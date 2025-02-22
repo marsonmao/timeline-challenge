@@ -8,55 +8,65 @@ import {
   validateNumber,
 } from "./NumberInput";
 
-type NumberContextValue = {
-  value: number;
-  setValue: (v: number) => void;
-};
-
-const NumberContext = createContext<NumberContextValue | undefined>(undefined);
-
-const NumberProvider = ({
-  children,
-  initialValue,
-}: React.PropsWithChildren<{ initialValue: number }>) => {
-  const [value, setValue] = useState<number>(initialValue);
-  return (
-    <NumberContext.Provider value={{ value, setValue }}>
-      {children}
-    </NumberContext.Provider>
-  );
-};
-
-const useNumber = (): NumberContextValue => {
-  const context = useContext(NumberContext);
-  if (!context) {
-    throw new Error("useNumber must be used within a NumberProvider");
-  }
-  return context;
-};
-
-const NumberInputWrapper = ({
-  validator,
-  config,
-}: Pick<NumberInputProps, "validator" | "config">) => {
-  const { value, setValue } = useNumber();
-  return (
-    <NumberInput
-      value={value}
-      onChange={setValue}
-      validator={validator}
-      config={config}
-    />
-  );
-};
-
 describe("NumberInput requirements", () => {
-  let validator: jest.Mock<number, [number, NumberConfig]>;
+  type NumberContextValue = {
+    value: number;
+    setValue: (v: number) => void;
+  };
+
+  const NumberContext = createContext<NumberContextValue | undefined>(
+    undefined
+  );
+
+  const NumberProvider = ({
+    children,
+    initialValue,
+  }: React.PropsWithChildren<{ initialValue: number }>) => {
+    const [value, setValue] = useState<number>(initialValue);
+    return (
+      <NumberContext.Provider value={{ value, setValue }}>
+        {children}
+      </NumberContext.Provider>
+    );
+  };
+
+  const useNumber = (): NumberContextValue => {
+    const context = useContext(NumberContext);
+    if (!context) {
+      throw new Error("useNumber must be used within a NumberProvider");
+    }
+    return context;
+  };
+
+  const NumberInputWrapper = ({
+    validator,
+    config,
+    onChange,
+  }: Pick<NumberInputProps, "validator" | "config"> & {
+    onChange?: jest.Mock<void, [number]>;
+  }) => {
+    const { value, setValue } = useNumber();
+
+    return (
+      <NumberInput
+        value={value}
+        onChange={(value) => {
+          onChange?.(value);
+          setValue(value);
+        }}
+        validator={validator}
+        config={config}
+      />
+    );
+  };
+
   const config = {
     step: 10,
     min: 0,
     max: 100,
   };
+  let validatorSpy: jest.Mock<number, [number, NumberConfig]>;
+  let onChangeSpy: jest.Mock<void, [number]>;
 
   // WORKAROUND: the correct behavior is not simulated by JSDOM
   function clickSpinner(
@@ -84,14 +94,19 @@ describe("NumberInput requirements", () => {
   }
 
   beforeEach(() => {
-    validator = jest.fn(validateNumber);
+    validatorSpy = jest.fn(validateNumber);
+    onChangeSpy = jest.fn();
   });
 
   describe("The displayed value updates immediately while typing, but onChange is not triggered until input is confirmed", () => {
     test("Clicking outside the input field removes focus and changes the value", async () => {
       const { getByRole, container } = render(
         <NumberProvider initialValue={10}>
-          <NumberInputWrapper validator={validator} config={config} />
+          <NumberInputWrapper
+            validator={validatorSpy}
+            config={config}
+            onChange={onChangeSpy}
+          />
         </NumberProvider>
       );
       const input = getByRole("spinbutton") as HTMLInputElement;
@@ -101,9 +116,12 @@ describe("NumberInput requirements", () => {
 
       await userEvent.clear(input);
       await userEvent.type(input, "25");
+      expect(onChangeSpy).toHaveBeenCalledTimes(0);
+
       await userEvent.click(container);
-      expect(validator).toHaveBeenCalledWith(25, config);
+      expect(validatorSpy).toHaveBeenCalledWith(25, config);
       expect(input.value).toBe("30");
+      expect(onChangeSpy).toHaveBeenCalledTimes(1);
       expect(document.activeElement).not.toBe(input);
     });
 
@@ -115,7 +133,11 @@ describe("NumberInput requirements", () => {
       };
       const { getByRole } = render(
         <NumberProvider initialValue={10}>
-          <NumberInputWrapper validator={validator} config={customConfig} />
+          <NumberInputWrapper
+            validator={validatorSpy}
+            config={customConfig}
+            onChange={onChangeSpy}
+          />
         </NumberProvider>
       );
       const input = getByRole("spinbutton") as HTMLInputElement;
@@ -123,14 +145,16 @@ describe("NumberInput requirements", () => {
       await userEvent.click(input);
 
       clickSpinner(input, "increment", 10, step);
-      expect(validator).toHaveBeenCalledWith(11, customConfig);
+      expect(validatorSpy).toHaveBeenCalledWith(11, customConfig);
       expect(input.value).toBe("11");
+      expect(onChangeSpy).toHaveBeenCalledTimes(1);
       fireEvent.mouseUp(input, { button: 0 });
       expect(document.activeElement).toBe(input);
 
       clickSpinner(input, "decrement", 11, step);
-      expect(validator).toHaveBeenCalledWith(10, customConfig);
+      expect(validatorSpy).toHaveBeenCalledWith(10, customConfig);
       expect(input.value).toBe("10");
+      expect(onChangeSpy).toHaveBeenCalledTimes(2);
       fireEvent.mouseUp(input, { button: 0 });
       expect(document.activeElement).toBe(input);
     });
@@ -143,22 +167,29 @@ describe("NumberInput requirements", () => {
       };
       const { getByRole } = render(
         <NumberProvider initialValue={10}>
-          <NumberInputWrapper validator={validator} config={customConfig} />
+          <NumberInputWrapper
+            validator={validatorSpy}
+            config={customConfig}
+            onChange={onChangeSpy}
+          />
         </NumberProvider>
       );
       const input = getByRole("spinbutton") as HTMLInputElement;
 
       await userEvent.click(input);
+      expect(onChangeSpy).toHaveBeenCalledTimes(0);
 
       pressArrowKey(input, "ArrowUp", 10, step);
-      expect(validator).toHaveBeenCalledWith(11, customConfig);
+      expect(validatorSpy).toHaveBeenCalledWith(11, customConfig);
       expect(input.value).toBe("11");
+      expect(onChangeSpy).toHaveBeenCalledTimes(1);
       fireEvent.keyUp(input, { key: "ArrowUp" });
       expect(document.activeElement).toBe(input);
 
       pressArrowKey(input, "ArrowDown", 11, step);
-      expect(validator).toHaveBeenCalledWith(10, customConfig);
+      expect(validatorSpy).toHaveBeenCalledWith(10, customConfig);
       expect(input.value).toBe("10");
+      expect(onChangeSpy).toHaveBeenCalledTimes(2);
       fireEvent.keyUp(input, { key: "ArrowDown" });
       expect(document.activeElement).toBe(input);
     });
@@ -166,40 +197,55 @@ describe("NumberInput requirements", () => {
     test("Pressing Enter confirms the new value and removes focus", async () => {
       const { getByRole } = render(
         <NumberProvider initialValue={40}>
-          <NumberInputWrapper validator={validator} config={config} />
+          <NumberInputWrapper
+            validator={validatorSpy}
+            config={config}
+            onChange={onChangeSpy}
+          />
         </NumberProvider>
       );
       const input = getByRole("spinbutton") as HTMLInputElement;
 
       await userEvent.click(input);
       expect(document.activeElement).toBe(input);
+      expect(onChangeSpy).toHaveBeenCalledTimes(0);
 
       await userEvent.clear(input);
       await userEvent.type(input, "45");
+      expect(onChangeSpy).toHaveBeenCalledTimes(0);
+
       await userEvent.keyboard("{Enter}");
-      expect(validator).toHaveBeenCalledWith(45, config);
+      expect(validatorSpy).toHaveBeenCalledWith(45, config);
       expect(input.value).toBe("50");
+      expect(onChangeSpy).toHaveBeenCalledTimes(1);
       expect(document.activeElement).not.toBe(input);
     });
 
     test("Move the focus away with tab should confirm the value", async () => {
       const { getByRole } = render(
         <NumberProvider initialValue={10}>
-          <NumberInputWrapper validator={validator} config={config} />
+          <NumberInputWrapper
+            validator={validatorSpy}
+            config={config}
+            onChange={onChangeSpy}
+          />
         </NumberProvider>
       );
       const input = getByRole("spinbutton") as HTMLInputElement;
 
       await userEvent.click(input);
       expect(document.activeElement).toBe(input);
+      expect(onChangeSpy).toHaveBeenCalledTimes(0);
 
       await userEvent.clear(input);
       await userEvent.type(input, "15");
       expect(input.value).toBe("15");
+      expect(onChangeSpy).toHaveBeenCalledTimes(0);
 
       await userEvent.tab();
-      expect(validator).toHaveBeenCalledWith(15, config);
+      expect(validatorSpy).toHaveBeenCalledWith(15, config);
       expect(input.value).toBe("20");
+      expect(onChangeSpy).toHaveBeenCalledTimes(1);
       expect(document.activeElement).not.toBe(input);
     });
   });
@@ -208,7 +254,7 @@ describe("NumberInput requirements", () => {
     test("entire text is selected when the input field gains focus", async () => {
       const { getByRole } = render(
         <NumberProvider initialValue={10}>
-          <NumberInputWrapper validator={validator} config={config} />
+          <NumberInputWrapper validator={validatorSpy} config={config} />
         </NumberProvider>
       );
       const input = getByRole("spinbutton") as HTMLInputElement;
@@ -221,7 +267,7 @@ describe("NumberInput requirements", () => {
     test("Entire text is selected after using the native step buttons", async () => {
       const { getByRole } = render(
         <NumberProvider initialValue={10}>
-          <NumberInputWrapper validator={validator} config={config} />
+          <NumberInputWrapper validator={validatorSpy} config={config} />
         </NumberProvider>
       );
       const input = getByRole("spinbutton") as HTMLInputElement;
@@ -242,7 +288,7 @@ describe("NumberInput requirements", () => {
     test("Entire text is selected after using the up arrow or down arrow keys", async () => {
       const { getByRole } = render(
         <NumberProvider initialValue={10}>
-          <NumberInputWrapper validator={validator} config={config} />
+          <NumberInputWrapper validator={validatorSpy} config={config} />
         </NumberProvider>
       );
       const input = getByRole("spinbutton") as HTMLInputElement;
@@ -265,7 +311,7 @@ describe("NumberInput requirements", () => {
     test("Pressing Escape reverts to the original value and removes focus", async () => {
       const { getByRole } = render(
         <NumberProvider initialValue={50}>
-          <NumberInputWrapper validator={validator} config={config} />
+          <NumberInputWrapper validator={validatorSpy} config={config} />
         </NumberProvider>
       );
       const input = getByRole("spinbutton") as HTMLInputElement;
@@ -284,7 +330,7 @@ describe("NumberInput requirements", () => {
     test("Leading zeros are automatically removed", async () => {
       const { getByRole } = render(
         <NumberProvider initialValue={100}>
-          <NumberInputWrapper validator={validator} config={config} />
+          <NumberInputWrapper validator={validatorSpy} config={config} />
         </NumberProvider>
       );
       const input = getByRole("spinbutton") as HTMLInputElement;
@@ -299,7 +345,7 @@ describe("NumberInput requirements", () => {
     test("Negative values are automatically adjusted to the minimum allowed value (with direct pasting)", async () => {
       const { getByRole } = render(
         <NumberProvider initialValue={10}>
-          <NumberInputWrapper validator={validator} config={config} />
+          <NumberInputWrapper validator={validatorSpy} config={config} />
         </NumberProvider>
       );
       const input = getByRole("spinbutton") as HTMLInputElement;
@@ -315,7 +361,7 @@ describe("NumberInput requirements", () => {
     test("Negative values are automatically adjusted to the minimum allowed value (with typing)", async () => {
       const { getByRole } = render(
         <NumberProvider initialValue={10}>
-          <NumberInputWrapper validator={validator} config={config} />
+          <NumberInputWrapper validator={validatorSpy} config={config} />
         </NumberProvider>
       );
       const input = getByRole("spinbutton") as HTMLInputElement;
@@ -332,7 +378,7 @@ describe("NumberInput requirements", () => {
     test("Decimal values are automatically rounded to the nearest integer", async () => {
       const { getByRole } = render(
         <NumberProvider initialValue={10}>
-          <NumberInputWrapper validator={validator} config={config} />
+          <NumberInputWrapper validator={validatorSpy} config={config} />
         </NumberProvider>
       );
       const input = getByRole("spinbutton") as HTMLInputElement;
@@ -347,7 +393,7 @@ describe("NumberInput requirements", () => {
     test("Invalid inputs (non-numeric) revert to the previous valid value", async () => {
       const { getByRole } = render(
         <NumberProvider initialValue={10}>
-          <NumberInputWrapper validator={validator} config={config} />
+          <NumberInputWrapper validator={validatorSpy} config={config} />
         </NumberProvider>
       );
       const input = getByRole("spinbutton") as HTMLInputElement;
