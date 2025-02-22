@@ -8,6 +8,7 @@ const config = {
    * In unit of Milliseconds
    */
   timeStep: 10,
+  minStartTime: 0,
   minEndTime: 100,
   maxEndTime: 2000,
 };
@@ -30,14 +31,19 @@ export const PlayControls = () => {
             value={globalTime}
             onChange={setGlobalTime}
             data-testid="current-time-input"
-            min={0}
-            max={config.maxEndTime}
+            min={config.minStartTime}
+            max={config.maxEndTime} // TODO dynamic, should be the current duration
             step={config.timeStep}
-            config={config}
+            config={{
+              timeStep: config.timeStep,
+              minTime: config.minStartTime,
+              maxTime: config.maxEndTime, // TODO dynamic, should be the current duration
+            }}
           />
         </fieldset>
         -
         <fieldset className="flex gap-1">
+          {/* TODO create a DurationTimeInput */}
           <input
             className="bg-gray-700 px-1 rounded"
             type="number"
