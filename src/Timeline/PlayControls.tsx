@@ -12,9 +12,11 @@ const config = {
 };
 
 export function validateTime(rawTime: number): number {
-  let time = rawTime;
-  if (Number.isNaN(rawTime)) {
+  let time = Math.round(rawTime / config.timeStep) * config.timeStep;
+  if (Number.isNaN(rawTime) || rawTime === -Infinity) {
     time = config.minEndTime;
+  } else if (time === Infinity) {
+    time = config.maxEndTime;
   }
   // TODO round decimal values
   return Math.min(config.maxEndTime, Math.max(config.minEndTime, time));
@@ -55,7 +57,7 @@ export const PlayControls = () => {
   }, []);
 
   const setGlobalTimeAndSyncInputTime = useCallback((inputTime: string) => {
-    const rawValue = parseInt(inputTime, 10);
+    const rawValue = parseFloat(inputTime);
     const validatedValue = validateTime(rawValue);
     setGlobalTime(validatedValue);
     setInputTime(validatedValue.toString());
