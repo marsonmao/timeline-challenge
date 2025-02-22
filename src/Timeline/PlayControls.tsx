@@ -38,6 +38,7 @@ export function validateTime(time: number): number {
 export const PlayControls = () => {
   // TODO: implement time <= maxTime
 
+  const inputElement = useRef<HTMLInputElement>(null);
   const [isEditingTime, setIsEditingTime] = React.useState(false);
   const { time: globalTime, setTime: setGlobalTime } =
     useContext(TimelineContext);
@@ -46,14 +47,17 @@ export const PlayControls = () => {
   const isArrowKeyDown = useRef(false);
   const blurTriggerKey = useRef<string|null>(null);
 
+  const selectInputText = () => {
+    inputElement.current?.select();
+  }
+
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = Number(e.target.value);
     const validatedValue = validateTime(rawValue);
 
     if (isSpinnerClicked.current || isArrowKeyDown.current) {
       setGlobalTime(validatedValue);
-
-      // TODO select all input text
+      selectInputText();
     }
 
     setInputTime(validatedValue);
@@ -61,8 +65,7 @@ export const PlayControls = () => {
 
   const onInputFocus = useCallback(() => {
     setIsEditingTime(true);
-
-    // TODO select all input text
+    selectInputText();
   }, []);
 
   const onInputBlur = () => {
@@ -139,6 +142,7 @@ export const PlayControls = () => {
             className="bg-gray-700 px-1 rounded"
             type="number"
             data-testid="current-time-input"
+            ref={inputElement}
             min={0}
             max={config.maxEndTime}
             step={config.timeStep}
