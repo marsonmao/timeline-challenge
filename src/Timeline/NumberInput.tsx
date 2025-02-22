@@ -52,12 +52,15 @@ export function NumberInput({
     inputElement.current?.select();
   }, []);
 
-  const handleValueChange = useCallback((localValue: string) => {
-    const rawValue = parseFloat(localValue);
-    const validatedValue = validator(rawValue);
-    onChange(validatedValue);
-    setLocalValue(validatedValue.toString());
-  }, [onChange]);
+  const handleValueChange = useCallback(
+    (localValue: string) => {
+      const rawValue = parseFloat(localValue);
+      const validatedValue = validator(rawValue);
+      onChange(validatedValue);
+      setLocalValue(validatedValue.toString());
+    },
+    [onChange]
+  );
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
