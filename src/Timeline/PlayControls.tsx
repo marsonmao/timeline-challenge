@@ -47,9 +47,9 @@ export const PlayControls = () => {
   const isArrowKeyDown = useRef(false);
   const blurTriggerKey = useRef<string | null>(null);
 
-  const selectInputText = () => {
+  const selectInputText = useCallback(() => {
     inputElement.current?.select();
-  }
+  }, []);
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = Number(e.target.value);
@@ -68,7 +68,7 @@ export const PlayControls = () => {
     selectInputText();
   }, []);
 
-  const onInputBlur = () => {
+  const onInputBlur = useCallback(() => {
     if (blurTriggerKey.current === "Escape") {
       setInputTime(globalTime);
     } else if (
@@ -80,25 +80,31 @@ export const PlayControls = () => {
 
     setIsEditingTime(false);
     blurTriggerKey.current = null;
-  };
+  }, []);
 
-  const onInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    /**
-     * If any key is pressed, it would break the spinner event chain, so we clear the flag.
-     */
-    isSpinnerClicked.current = false;
+  const onInputKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      /**
+       * If any key is pressed, it would break the spinner event chain, so we clear the flag.
+       */
+      isSpinnerClicked.current = false;
 
-    if (e.key === "Enter" || e.key === "Escape") {
-      blurTriggerKey.current = e.key;
-      e.currentTarget.blur();
-    } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-      isArrowKeyDown.current = true;
-    }
-  };
+      if (e.key === "Enter" || e.key === "Escape") {
+        blurTriggerKey.current = e.key;
+        e.currentTarget.blur();
+      } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+        isArrowKeyDown.current = true;
+      }
+    },
+    []
+  );
 
-  const onInputKeyUp = (_e: React.KeyboardEvent<HTMLInputElement>) => {
-    isArrowKeyDown.current = false;
-  };
+  const onInputKeyUp = useCallback(
+    (_e: React.KeyboardEvent<HTMLInputElement>) => {
+      isArrowKeyDown.current = false;
+    },
+    []
+  );
 
   const onInputMouseDown = useCallback(
     (_e: React.MouseEvent<HTMLInputElement>) => {
