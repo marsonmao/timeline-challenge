@@ -4,7 +4,7 @@ import { useTime } from "./useTime";
 import { validateNumber } from "./NumberInput";
 
 export const Ruler = () => {
-  // TODO: implement mousedown and mousemove to update time and Playhead position
+  // TODO: implement mousedown and mousemove Playhead position
   const { setCurrentTime, currentTimeConfig, durationTime } = useTime();
 
   const handleClick = useCallback<
