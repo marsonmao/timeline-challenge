@@ -6,12 +6,29 @@ import { TimelineContext } from "./TimelineContext";
 
 describe("PlayControls requirements", () => {
   const TimelineProvider = ({
-    initialTime,
+    initialCurrentTime,
+    initialDurationTime,
     children,
-  }: PropsWithChildren<{ initialTime: number }>) => {
-    const [time, setTime] = useState(initialTime);
+  }: PropsWithChildren<{
+    initialCurrentTime: number;
+    initialDurationTime: number;
+  }>) => {
+    const [currentTime, setCurrentTime] = useState(initialCurrentTime);
+    const [durationTime, setDurationTime] = useState(initialDurationTime);
+    const currentTimeConfig = { step: 10, min: 0, max: 6000 };
+    const durationTimeConfig = { step: 10, min: 100, max: 6000 };
     return (
-      <TimelineContext.Provider value={{ time, setTime }}>
+      <TimelineContext.Provider
+        value={{
+          currentTime,
+          setCurrentTime,
+          currentTimeConfig,
+          setCurrentTimeConfig: () => {},
+          durationTime,
+          setDurationTime,
+          durationTimeConfig,
+        }}
+      >
         {children}
       </TimelineContext.Provider>
     );
@@ -19,7 +36,7 @@ describe("PlayControls requirements", () => {
 
   test("Current Time is always between 0ms and the Duration", async () => {
     render(
-      <TimelineProvider initialTime={0}>
+      <TimelineProvider initialCurrentTime={0} initialDurationTime={6000}>
         <PlayControls />
       </TimelineProvider>
     );
@@ -40,7 +57,7 @@ describe("PlayControls requirements", () => {
 
   test("Current Time adjusts if it exceeds the newly set Duration", async () => {
     render(
-      <TimelineProvider initialTime={5000}>
+      <TimelineProvider initialCurrentTime={5000} initialDurationTime={6000}>
         <PlayControls />
       </TimelineProvider>
     );
@@ -60,7 +77,7 @@ describe("PlayControls requirements", () => {
 
   test("Duration is always between 100ms and 6000ms", async () => {
     render(
-      <TimelineProvider initialTime={0}>
+      <TimelineProvider initialCurrentTime={0} initialDurationTime={6000}>
         <PlayControls />
       </TimelineProvider>
     );
@@ -81,7 +98,7 @@ describe("PlayControls requirements", () => {
 
   test("Current Time and Duration are always multiples of 10ms and positive integers", async () => {
     render(
-      <TimelineProvider initialTime={0}>
+      <TimelineProvider initialCurrentTime={0} initialDurationTime={6000}>
         <PlayControls />
       </TimelineProvider>
     );
