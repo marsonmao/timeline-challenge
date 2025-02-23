@@ -1,41 +1,17 @@
-import { memo, useCallback, useContext, useMemo, useState } from "react";
+import { memo } from "react";
 import { NumberInput, validateNumber } from "./NumberInput";
 import { RenderTracker } from "./RenderTracker";
-import { TimelineContext } from "./TimelineContext";
+import { useTime } from "./useTime";
 
 export const PlayControls = () => {
-  const durationTimeConfig = useMemo(
-    () => ({
-      /**
-       * In unit of Milliseconds
-       */
-      step: 10,
-      min: 100,
-      max: 6000,
-    }),
-    []
-  );
-  const [durationTime, setDurationTime] = useState(durationTimeConfig.max);
-  const currentTimeConfig = useMemo(
-    () => ({
-      /**
-       * In unit of Milliseconds
-       */
-      step: 10,
-      min: 0,
-      max: durationTime,
-    }),
-    [durationTime]
-  );
-  const { time: currentTime, setTime: setCurrentTime } =
-    useContext(TimelineContext);
-  const setDurationTimeAndCapCurrentTime = useCallback(
-    (durationTimeValue: number) => {
-      setDurationTime(durationTimeValue);
-      setCurrentTime(Math.min(currentTime, durationTimeValue));
-    },
-    [currentTime]
-  );
+  const {
+    currentTime,
+    setCurrentTime,
+    currentTimeConfig,
+    durationTime,
+    setDurationTime,
+    durationTimeConfig,
+  } = useTime();
 
   return (
     <>
@@ -59,14 +35,10 @@ export const PlayControls = () => {
         <fieldset className="flex gap-1">
           <NumberInput
             value={durationTime}
-            onChange={setDurationTimeAndCapCurrentTime}
+            onChange={setDurationTime}
             data-testid="duration-input"
             validator={validateNumber}
-            config={{
-              step: durationTimeConfig.step,
-              min: durationTimeConfig.min,
-              max: durationTimeConfig.max,
-            }}
+            config={durationTimeConfig}
           />
           Duration
         </fieldset>

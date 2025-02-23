@@ -1,14 +1,42 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { PlayheadMemoed as Playhead } from "./Playhead";
 import { RulerMemoed as Ruler } from "./Ruler";
 import { TrackListMemoed as TrackList } from "./TrackList";
 import { KeyframeListMemoed as KeyframeList } from "./KeyframeList";
 import { PlayControlsMemoed as PlayControls } from "./PlayControls";
-import { TimelineContext } from "./TimelineContext";
+import { TimeConfig, TimelineContext } from "./TimelineContext";
 
 export const Timeline = () => {
-  const [time, setTime] = useState(0);
-  const timelineContextValue = { time, setTime };
+  const durationTimeConfig = useMemo<TimeConfig>(
+    () => ({
+      /**
+       * In unit of Milliseconds
+       */
+      step: 10,
+      min: 100,
+      max: 6000,
+    }),
+    []
+  );
+  const [currentTimeConfig, setCurrentTimeConfig] = useState<TimeConfig>({
+    /**
+     * In unit of Milliseconds
+     */
+    step: 10,
+    min: 0,
+    max: 6000,
+  });
+  const [currentTime, setCurrentTime] = useState(currentTimeConfig.min);
+  const [durationTime, setDurationTime] = useState(durationTimeConfig.max);
+  const timelineContextValue = {
+    currentTime,
+    setCurrentTime,
+    currentTimeConfig,
+    setCurrentTimeConfig,
+    durationTime,
+    setDurationTime,
+    durationTimeConfig,
+  };
 
   return (
     <div
