@@ -1,6 +1,6 @@
 import { fireEvent, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useRef, useState } from "react";
 import { NumberInput, NumberInputProps, validateNumber } from "./NumberInput";
 
 describe("NumberInput requirements", () => {
@@ -43,14 +43,17 @@ describe("NumberInput requirements", () => {
     "data-testid"?: string;
   }) => {
     const { value, setValue } = useNumber();
+    const onChangeLatest = useRef(onChange);
+    onChangeLatest.current = onChange;
+    const handleChange = useRef((value: number) => {
+      onChangeLatest.current?.(value);
+      setValue(value);
+    });
 
     return (
       <NumberInput
         value={value}
-        onChange={(value) => {
-          onChange?.(value);
-          setValue(value);
-        }}
+        onChange={handleChange.current}
         validator={validator}
         config={config}
         data-testid={dataTestId}
@@ -457,6 +460,43 @@ describe("NumberInput requirements", () => {
       await userEvent.tab();
       expect(input.value).toBe("0");
       expect(input).not.toHaveAttribute("data-invalid");
+    });
+
+    test("If config changes, the validation result should reflect it accordingly", async () => {
+      const config1 = {
+        step: 1,
+        min: 0,
+        max: 300,
+      };
+      const config2 = {
+        step: 1,
+        min: 0,
+        max: 100,
+      };
+      const { getByRole, rerender } = render(
+        <NumberProvider initialValue={10}>
+          <NumberInputWrapper validator={validatorSpy} config={config1} />
+        </NumberProvider>
+      );
+      const input = getByRole("spinbutton") as HTMLInputElement;
+
+      await userEvent.click(input);
+      await userEvent.clear(input);
+      await userEvent.type(input, "300");
+      await userEvent.keyboard("{Enter}");
+      expect(input.value).toBe("300");
+
+      rerender(
+        <NumberProvider initialValue={10}>
+          <NumberInputWrapper validator={validatorSpy} config={config2} />
+        </NumberProvider>
+      );
+
+      await userEvent.click(input);
+      expect(input.value).toBe("300");
+
+      await userEvent.keyboard("{Enter}");
+      expect(input.value).toBe("100");
     });
   });
 

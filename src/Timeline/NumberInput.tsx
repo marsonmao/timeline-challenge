@@ -82,7 +82,7 @@ export function NumberInput({
       onChange(validatedValue);
       setLocalValue(validatedValue.toString());
     },
-    [onChange]
+    [config, onChange]
   );
 
   const handleChange = useCallback(
