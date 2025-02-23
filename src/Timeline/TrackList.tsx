@@ -1,6 +1,14 @@
 import { memo } from "react";
 import { RenderTracker } from "./RenderTracker";
 
+const Track = ({ name }: { name: string }) => {
+  return (
+    <div className="p-2 select-none">
+      <div>{name}</div>
+    </div>
+  );
+};
+
 export const TrackList = () => {
   // TODO: implement scroll sync with `KeyframeList`
 
@@ -13,36 +21,16 @@ export const TrackList = () => {
       overflow-auto"
         data-testid="track-list"
       >
-        <div className="p-2">
-          <div>Track A</div>
-        </div>
-        <div className="p-2">
-          <div>Track B</div>
-        </div>
-        <div className="p-2">
-          <div>Track C</div>
-        </div>
-        <div className="p-2">
-          <div>Track D</div>
-        </div>
-        <div className="p-2">
-          <div>Track E</div>
-        </div>
-        <div className="p-2">
-          <div>Track F </div>
-        </div>
-        <div className="p-2">
-          <div>Track G</div>
-        </div>
-        <div className="p-2">
-          <div>Track H</div>
-        </div>
-        <div className="p-2">
-          <div>Track I </div>
-        </div>
-        <div className="p-2">
-          <div>Track J</div>
-        </div>
+        <Track name="Track A" />
+        <Track name="Track B" />
+        <Track name="Track C" />
+        <Track name="Track D" />
+        <Track name="Track E" />
+        <Track name="Track F" />
+        <Track name="Track G" />
+        <Track name="Track H" />
+        <Track name="Track I" />
+        <Track name="Track J" />
       </div>
     </>
   );
