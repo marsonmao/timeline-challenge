@@ -1,4 +1,4 @@
-import { memo, useContext } from "react";
+import { memo, useContext, useState } from "react";
 import { NumberInput, validateNumber } from "./NumberInput";
 import { RenderTracker } from "./RenderTracker";
 import { TimelineContext } from "./TimelineContext";
@@ -21,8 +21,9 @@ const durationTimeConfig = {
 };
 
 export const PlayControls = () => {
-  const { time: globalTime, setTime: setGlobalTime } =
+  const { time: currentTime, setTime: setCurrentTime } =
     useContext(TimelineContext);
+  const [durationTime, setDurationTime] = useState(durationTimeConfig.max);
 
   return (
     <>
@@ -35,28 +36,29 @@ export const PlayControls = () => {
         <fieldset className="flex gap-1">
           Current
           <NumberInput
-            value={globalTime}
-            onChange={setGlobalTime}
+            value={currentTime}
+            onChange={setCurrentTime}
             data-testid="current-time-input"
             validator={validateNumber}
             config={{
               step: currentTimeConfig.step,
               min: currentTimeConfig.min,
-              max: 2000, // TODO should be the current duration and defined in a Context
+              max: durationTime,
             }}
           />
         </fieldset>
         -
         <fieldset className="flex gap-1">
-          {/* TODO create a DurationTimeInput */}
-          <input
-            className="bg-gray-700 px-1 rounded"
-            type="number"
+          <NumberInput
+            value={durationTime}
+            onChange={setDurationTime}
             data-testid="duration-input"
-            min={durationTimeConfig.min}
-            max={durationTimeConfig.max}
-            step={durationTimeConfig.step}
-            defaultValue={durationTimeConfig.max}
+            validator={validateNumber}
+            config={{
+              step: durationTimeConfig.step,
+              min: durationTimeConfig.min,
+              max: durationTimeConfig.max,
+            }}
           />
           Duration
         </fieldset>
