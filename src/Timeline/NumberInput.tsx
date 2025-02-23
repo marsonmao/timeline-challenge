@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useRef, useState } from "react";
 
 export type NumberConfig = {
   step: number;
@@ -6,20 +6,49 @@ export type NumberConfig = {
   max: number;
 };
 
-export function validateNumber(rawTime: number, config: NumberConfig): number {
-  let time = Math.round(rawTime / config.step) * config.step;
-  if (Number.isNaN(rawTime) || rawTime === -Infinity) {
-    time = config.min;
-  } else if (time === Infinity) {
-    time = config.max;
+export function validateNumber(rawTime: number, config: NumberConfig) {
+  let hasError = false;
+  let result = rawTime;
+
+  hasError =
+    hasError ||
+    Number.isNaN(result) ||
+    result === -Infinity ||
+    result === Infinity;
+  if (hasError) {
+    if (Number.isNaN(result) || result === -Infinity) {
+      result = config.min;
+    } else if (result === Infinity) {
+      result = config.max;
+    }
   }
-  return Math.min(config.max, Math.max(config.min, time));
+
+  hasError = hasError || result < config.min || result > config.max;
+  if (hasError) {
+    result = Math.min(config.max, Math.max(config.min, result));
+  }
+
+  hasError = hasError || result % config.step !== 0;
+  if (hasError) {
+    result = Math.round(result / config.step) * config.step;
+  }
+
+  return {
+    hasError,
+    result,
+  };
 }
 
 export type NumberInputProps = {
   value: number;
   onChange: (value: number) => void;
-  validator: (rawTime: number, config: NumberConfig) => number;
+  validator: (
+    rawTime: number,
+    config: NumberConfig
+  ) => {
+    hasError: boolean;
+    result: number;
+  };
   config: NumberConfig;
 } & {
   // TODO extract to a separate type
@@ -40,6 +69,7 @@ export function NumberInput({
   const isSpinnerClicked = useRef(false);
   const isArrowKeyDown = useRef(false);
   const blurTriggerKey = useRef<string | null>(null);
+  const [hasError, setHasError] = useState(false);
 
   const selectInputText = useCallback(() => {
     inputElement.current?.select();
@@ -48,7 +78,7 @@ export function NumberInput({
   const handleValueChange = useCallback(
     (localValue: string) => {
       const rawValue = parseFloat(localValue);
-      const validatedValue = validator(rawValue, config);
+      const { result: validatedValue } = validator(rawValue, config);
       onChange(validatedValue);
       setLocalValue(validatedValue.toString());
     },
@@ -68,7 +98,9 @@ export function NumberInput({
       // }
       else {
         setLocalValue(e.target.value);
-        // TODO make invalid text red
+
+        const { hasError } = validator(parseFloat(e.target.value), config);
+        setHasError(hasError);
       }
     },
     [selectInputText, handleValueChange]
@@ -91,6 +123,7 @@ export function NumberInput({
 
     setIsEditing(false);
     blurTriggerKey.current = null;
+    setHasError(false);
   };
 
   const handleKeyDown = useCallback(
@@ -144,11 +177,13 @@ export function NumberInput({
   );
 
   const inputValue = isEditing ? localValue : valueString;
+  const displayError = hasError && isEditing;
 
   return (
     <input
       {...rest}
-      className="bg-gray-700 px-1 rounded"
+      data-invalid={displayError ? "true" : undefined}
+      className="bg-gray-700 px-1 rounded data-[invalid=true]:text-red-500"
       type="number"
       ref={inputElement}
       min={config.min}

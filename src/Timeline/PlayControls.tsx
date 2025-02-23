@@ -1,28 +1,41 @@
-import { memo, useContext } from "react";
+import { memo, useCallback, useContext, useMemo, useState } from "react";
 import { NumberInput, validateNumber } from "./NumberInput";
 import { RenderTracker } from "./RenderTracker";
 import { TimelineContext } from "./TimelineContext";
 
-const currentTimeConfig = {
-  /**
-   * In unit of Milliseconds
-   */
-  step: 10,
-  min: 0,
-};
-
-const durationTimeConfig = {
-  /**
-   * In unit of Milliseconds
-   */
-  step: 10,
-  min: 100,
-  max: 6000,
-};
-
 export const PlayControls = () => {
-  const { time: globalTime, setTime: setGlobalTime } =
+  const durationTimeConfig = useMemo(
+    () => ({
+      /**
+       * In unit of Milliseconds
+       */
+      step: 10,
+      min: 100,
+      max: 6000,
+    }),
+    []
+  );
+  const [durationTime, setDurationTime] = useState(durationTimeConfig.max);
+  const currentTimeConfig = useMemo(
+    () => ({
+      /**
+       * In unit of Milliseconds
+       */
+      step: 10,
+      min: 0,
+      max: durationTime,
+    }),
+    [durationTime]
+  );
+  const { time: currentTime, setTime: setCurrentTime } =
     useContext(TimelineContext);
+  const setDurationTimeAndCapCurrentTime = useCallback(
+    (durationTimeValue: number) => {
+      setDurationTime(durationTimeValue);
+      setCurrentTime(Math.min(currentTime, durationTimeValue));
+    },
+    [currentTime]
+  );
 
   return (
     <>
@@ -35,28 +48,25 @@ export const PlayControls = () => {
         <fieldset className="flex gap-1">
           Current
           <NumberInput
-            value={globalTime}
-            onChange={setGlobalTime}
+            value={currentTime}
+            onChange={setCurrentTime}
             data-testid="current-time-input"
             validator={validateNumber}
-            config={{
-              step: currentTimeConfig.step,
-              min: currentTimeConfig.min,
-              max: 2000, // TODO should be the current duration and defined in a Context
-            }}
+            config={currentTimeConfig}
           />
         </fieldset>
         -
         <fieldset className="flex gap-1">
-          {/* TODO create a DurationTimeInput */}
-          <input
-            className="bg-gray-700 px-1 rounded"
-            type="number"
+          <NumberInput
+            value={durationTime}
+            onChange={setDurationTimeAndCapCurrentTime}
             data-testid="duration-input"
-            min={durationTimeConfig.min}
-            max={durationTimeConfig.max}
-            step={durationTimeConfig.step}
-            defaultValue={durationTimeConfig.max}
+            validator={validateNumber}
+            config={{
+              step: durationTimeConfig.step,
+              min: durationTimeConfig.min,
+              max: durationTimeConfig.max,
+            }}
           />
           Duration
         </fieldset>
