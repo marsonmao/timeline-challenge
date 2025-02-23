@@ -9,7 +9,7 @@ export const Playhead = () => {
     <>
       <RenderTracker dataTestId="playhead-render-tracker" />
       <div
-        className="absolute left-[316px] h-full border-l-2 border-solid border-yellow-600 z-10"
+        className="absolute left-[300px] ml-4 h-full border-l-2 border-solid border-yellow-600 z-10"
         data-testid="playhead"
         style={{ transform: `translateX(calc(${currentTime}px - 50%))` }}
       >
