@@ -37,8 +37,10 @@ describe("NumberInput requirements", () => {
     validator,
     config,
     onChange,
+    ["data-testid"]: dataTestId,
   }: Pick<NumberInputProps, "validator" | "config"> & {
     onChange?: jest.Mock<void, [number]>;
+    "data-testid"?: string;
   }) => {
     const { value, setValue } = useNumber();
 
@@ -51,6 +53,7 @@ describe("NumberInput requirements", () => {
         }}
         validator={validator}
         config={config}
+        data-testid={dataTestId}
       />
     );
   };
@@ -321,6 +324,46 @@ describe("NumberInput requirements", () => {
       await userEvent.keyboard("{Escape}");
       expect(input.value).toBe("50");
       expect(document.activeElement).not.toBe(input);
+    });
+  });
+
+  describe("Edge cases", () => {
+    test("If global value is changed when blurred, the local value should be reset when focused next time", async () => {
+      const { getByTestId } = render(
+        <NumberProvider initialValue={50}>
+          <NumberInputWrapper
+            validator={validatorSpy}
+            config={config}
+            data-testid={"input-1"}
+          />
+          <NumberInputWrapper
+            validator={validatorSpy}
+            config={config}
+            data-testid={"input-2"}
+          />
+        </NumberProvider>
+      );
+
+      const input1 = getByTestId("input-1") as HTMLInputElement;
+      const input2 = getByTestId("input-2") as HTMLInputElement;
+      expect(input1.value).toBe("50");
+      expect(input2.value).toBe("50");
+
+      await userEvent.click(input1);
+      expect(input1.value).toBe("50");
+
+      await userEvent.click(input2);
+      expect(input1.value).toBe("50");
+
+      await userEvent.click(input1);
+      await userEvent.clear(input1);
+      await userEvent.type(input1, "100");
+      await userEvent.keyboard("{Enter}");
+      expect(input1.value).toBe("100");
+      expect(input2.value).toBe("100");
+
+      await userEvent.click(input2);
+      expect(input2.value).toBe("100");
     });
   });
 
