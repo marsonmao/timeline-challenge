@@ -1,12 +1,7 @@
 import { fireEvent, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React, { createContext, useContext, useState } from "react";
-import {
-  NumberConfig,
-  NumberInput,
-  NumberInputProps,
-  validateNumber,
-} from "./NumberInput";
+import { NumberInput, NumberInputProps, validateNumber } from "./NumberInput";
 
 describe("NumberInput requirements", () => {
   type NumberContextValue = {
@@ -65,7 +60,10 @@ describe("NumberInput requirements", () => {
     min: 0,
     max: 100,
   };
-  let validatorSpy: jest.Mock<number, [number, NumberConfig]>;
+  let validatorSpy: jest.Mock<
+    ReturnType<NumberInputProps["validator"]>,
+    Parameters<NumberInputProps["validator"]>
+  >;
   let onChangeSpy: jest.Mock<void, [number]>;
 
   // WORKAROUND: the correct behavior is not simulated by JSDOM

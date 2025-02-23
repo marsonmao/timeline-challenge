@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useRef, useState } from "react";
 
 export type NumberConfig = {
   step: number;
@@ -6,20 +6,30 @@ export type NumberConfig = {
   max: number;
 };
 
-export function validateNumber(rawTime: number, config: NumberConfig): number {
+export function validateNumber(rawTime: number, config: NumberConfig) {
   let time = Math.round(rawTime / config.step) * config.step;
   if (Number.isNaN(rawTime) || rawTime === -Infinity) {
     time = config.min;
   } else if (time === Infinity) {
     time = config.max;
   }
-  return Math.min(config.max, Math.max(config.min, time));
+  const result = Math.min(config.max, Math.max(config.min, time));
+  return {
+    hasError: false,
+    result,
+  };
 }
 
 export type NumberInputProps = {
   value: number;
   onChange: (value: number) => void;
-  validator: (rawTime: number, config: NumberConfig) => number;
+  validator: (
+    rawTime: number,
+    config: NumberConfig
+  ) => {
+    hasError: boolean;
+    result: number;
+  };
   config: NumberConfig;
 } & {
   // TODO extract to a separate type
@@ -40,6 +50,7 @@ export function NumberInput({
   const isSpinnerClicked = useRef(false);
   const isArrowKeyDown = useRef(false);
   const blurTriggerKey = useRef<string | null>(null);
+  const [hasError, setHasError] = useState(false);
 
   const selectInputText = useCallback(() => {
     inputElement.current?.select();
@@ -48,7 +59,7 @@ export function NumberInput({
   const handleValueChange = useCallback(
     (localValue: string) => {
       const rawValue = parseFloat(localValue);
-      const validatedValue = validator(rawValue, config);
+      const { result: validatedValue, hasError } = validator(rawValue, config);
       onChange(validatedValue);
       setLocalValue(validatedValue.toString());
     },
@@ -148,7 +159,8 @@ export function NumberInput({
   return (
     <input
       {...rest}
-      className="bg-gray-700 px-1 rounded"
+      data-invalid={hasError ? "true" : "false"}
+      className="bg-gray-700 px-1 rounded data-[invalid=true]:text-red-500"
       type="number"
       ref={inputElement}
       min={config.min}
