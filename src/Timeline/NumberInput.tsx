@@ -82,7 +82,7 @@ export function NumberInput({
       onChange(validatedValue);
       setLocalValue(validatedValue.toString());
     },
-    [onChange]
+    [config, onChange]
   );
 
   const handleChange = useCallback(
@@ -108,8 +108,9 @@ export function NumberInput({
 
   const handleFocus = useCallback(() => {
     setIsEditing(true);
+    setLocalValue(valueString);
     selectInputText();
-  }, [selectInputText]);
+  }, [valueString, selectInputText]);
 
   const handleBlur = () => {
     if (blurTriggerKey.current === "Escape") {

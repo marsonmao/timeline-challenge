@@ -1,6 +1,6 @@
 import { fireEvent, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useRef, useState } from "react";
 import { NumberInput, NumberInputProps, validateNumber } from "./NumberInput";
 
 describe("NumberInput requirements", () => {
@@ -37,20 +37,26 @@ describe("NumberInput requirements", () => {
     validator,
     config,
     onChange,
+    ["data-testid"]: dataTestId,
   }: Pick<NumberInputProps, "validator" | "config"> & {
     onChange?: jest.Mock<void, [number]>;
+    "data-testid"?: string;
   }) => {
     const { value, setValue } = useNumber();
+    const onChangeLatest = useRef(onChange);
+    onChangeLatest.current = onChange;
+    const handleChange = useRef((value: number) => {
+      onChangeLatest.current?.(value);
+      setValue(value);
+    });
 
     return (
       <NumberInput
         value={value}
-        onChange={(value) => {
-          onChange?.(value);
-          setValue(value);
-        }}
+        onChange={handleChange.current}
         validator={validator}
         config={config}
+        data-testid={dataTestId}
       />
     );
   };
@@ -324,6 +330,46 @@ describe("NumberInput requirements", () => {
     });
   });
 
+  describe("Edge cases", () => {
+    test("If global value is changed when blurred, the local value should be reset when focused next time", async () => {
+      const { getByTestId } = render(
+        <NumberProvider initialValue={50}>
+          <NumberInputWrapper
+            validator={validatorSpy}
+            config={config}
+            data-testid={"input-1"}
+          />
+          <NumberInputWrapper
+            validator={validatorSpy}
+            config={config}
+            data-testid={"input-2"}
+          />
+        </NumberProvider>
+      );
+
+      const input1 = getByTestId("input-1") as HTMLInputElement;
+      const input2 = getByTestId("input-2") as HTMLInputElement;
+      expect(input1.value).toBe("50");
+      expect(input2.value).toBe("50");
+
+      await userEvent.click(input1);
+      expect(input1.value).toBe("50");
+
+      await userEvent.click(input2);
+      expect(input1.value).toBe("50");
+
+      await userEvent.click(input1);
+      await userEvent.clear(input1);
+      await userEvent.type(input1, "100");
+      await userEvent.keyboard("{Enter}");
+      expect(input1.value).toBe("100");
+      expect(input2.value).toBe("100");
+
+      await userEvent.click(input2);
+      expect(input2.value).toBe("100");
+    });
+  });
+
   describe("Validation requirements", () => {
     test("Leading zeros are automatically removed", async () => {
       const { getByRole } = render(
@@ -414,6 +460,43 @@ describe("NumberInput requirements", () => {
       await userEvent.tab();
       expect(input.value).toBe("0");
       expect(input).not.toHaveAttribute("data-invalid");
+    });
+
+    test("If config changes, the validation result should reflect it accordingly", async () => {
+      const config1 = {
+        step: 1,
+        min: 0,
+        max: 300,
+      };
+      const config2 = {
+        step: 1,
+        min: 0,
+        max: 100,
+      };
+      const { getByRole, rerender } = render(
+        <NumberProvider initialValue={10}>
+          <NumberInputWrapper validator={validatorSpy} config={config1} />
+        </NumberProvider>
+      );
+      const input = getByRole("spinbutton") as HTMLInputElement;
+
+      await userEvent.click(input);
+      await userEvent.clear(input);
+      await userEvent.type(input, "300");
+      await userEvent.keyboard("{Enter}");
+      expect(input.value).toBe("300");
+
+      rerender(
+        <NumberProvider initialValue={10}>
+          <NumberInputWrapper validator={validatorSpy} config={config2} />
+        </NumberProvider>
+      );
+
+      await userEvent.click(input);
+      expect(input.value).toBe("300");
+
+      await userEvent.keyboard("{Enter}");
+      expect(input.value).toBe("100");
     });
   });
 
