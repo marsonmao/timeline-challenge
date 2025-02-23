@@ -43,16 +43,24 @@ describe("PlayControls requirements", () => {
     const currentInput = screen.getByTestId(
       "current-time-input"
     ) as HTMLInputElement;
+    const durationInput = screen.getByTestId(
+      "duration-input"
+    ) as HTMLInputElement;
+    const durationTime = parseInt(durationInput.value);
+    expect(parseInt(currentInput.value, 10)).toBeGreaterThanOrEqual(0);
+    expect(parseInt(currentInput.value, 10)).toBeLessThanOrEqual(durationTime);
 
     await userEvent.clear(currentInput);
     await userEvent.type(currentInput, "-50");
     await userEvent.tab();
     expect(parseInt(currentInput.value, 10)).toBeGreaterThanOrEqual(0);
+    expect(parseInt(currentInput.value, 10)).toBeLessThanOrEqual(durationTime);
 
     await userEvent.clear(currentInput);
     await userEvent.type(currentInput, "7000");
     await userEvent.tab();
-    expect(parseInt(currentInput.value, 10)).toBeLessThanOrEqual(6000);
+    expect(parseInt(currentInput.value, 10)).toBeGreaterThanOrEqual(0);
+    expect(parseInt(currentInput.value, 10)).toBeLessThanOrEqual(durationTime);
   });
 
   test("Current Time adjusts if it exceeds the newly set Duration", async () => {
@@ -84,15 +92,19 @@ describe("PlayControls requirements", () => {
     const durationInput = screen.getByTestId(
       "duration-input"
     ) as HTMLInputElement;
+    expect(parseInt(durationInput.value, 10)).toBeGreaterThanOrEqual(100);
+    expect(parseInt(durationInput.value, 10)).toBeLessThanOrEqual(6000);
 
     await userEvent.clear(durationInput);
     await userEvent.type(durationInput, "50");
     await userEvent.tab();
     expect(parseInt(durationInput.value, 10)).toBeGreaterThanOrEqual(100);
+    expect(parseInt(durationInput.value, 10)).toBeLessThanOrEqual(6000);
 
     await userEvent.clear(durationInput);
     await userEvent.type(durationInput, "7000");
     await userEvent.tab();
+    expect(parseInt(durationInput.value, 10)).toBeGreaterThanOrEqual(100);
     expect(parseInt(durationInput.value, 10)).toBeLessThanOrEqual(6000);
   });
 
