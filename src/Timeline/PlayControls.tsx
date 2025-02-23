@@ -1,29 +1,41 @@
-import { memo, useContext, useState } from "react";
+import { memo, useCallback, useContext, useMemo, useState } from "react";
 import { NumberInput, validateNumber } from "./NumberInput";
 import { RenderTracker } from "./RenderTracker";
 import { TimelineContext } from "./TimelineContext";
 
-const currentTimeConfig = {
-  /**
-   * In unit of Milliseconds
-   */
-  step: 10,
-  min: 0,
-};
-
-const durationTimeConfig = {
-  /**
-   * In unit of Milliseconds
-   */
-  step: 10,
-  min: 100,
-  max: 6000,
-};
-
 export const PlayControls = () => {
+  const durationTimeConfig = useMemo(
+    () => ({
+      /**
+       * In unit of Milliseconds
+       */
+      step: 10,
+      min: 100,
+      max: 6000,
+    }),
+    []
+  );
+  const [durationTime, setDurationTime] = useState(durationTimeConfig.max);
+  const currentTimeConfig = useMemo(
+    () => ({
+      /**
+       * In unit of Milliseconds
+       */
+      step: 10,
+      min: 0,
+      max: durationTime,
+    }),
+    [durationTime]
+  );
   const { time: currentTime, setTime: setCurrentTime } =
     useContext(TimelineContext);
-  const [durationTime, setDurationTime] = useState(durationTimeConfig.max);
+  const setDurationTimeAndCapCurrentTime = useCallback(
+    (durationTimeValue: number) => {
+      setDurationTime(durationTimeValue);
+      setCurrentTime(Math.min(currentTime, durationTimeValue));
+    },
+    [currentTime]
+  );
 
   return (
     <>
@@ -40,18 +52,14 @@ export const PlayControls = () => {
             onChange={setCurrentTime}
             data-testid="current-time-input"
             validator={validateNumber}
-            config={{
-              step: currentTimeConfig.step,
-              min: currentTimeConfig.min,
-              max: durationTime,
-            }}
+            config={currentTimeConfig}
           />
         </fieldset>
         -
         <fieldset className="flex gap-1">
           <NumberInput
             value={durationTime}
-            onChange={setDurationTime}
+            onChange={setDurationTimeAndCapCurrentTime}
             data-testid="duration-input"
             validator={validateNumber}
             config={{
