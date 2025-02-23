@@ -336,8 +336,11 @@ describe("NumberInput requirements", () => {
       await userEvent.click(input);
       await userEvent.clear(input);
       await userEvent.type(input, "00100");
+      expect(input).not.toHaveAttribute("data-invalid"); // Currently count as valid because this can represent a number
+
       await userEvent.tab();
       expect(input.value).toBe("100");
+      expect(input).not.toHaveAttribute("data-invalid");
     });
 
     test("Negative values are automatically adjusted to the minimum allowed value (with direct pasting)", async () => {
@@ -351,9 +354,11 @@ describe("NumberInput requirements", () => {
       await userEvent.click(input);
       await userEvent.paste("-5");
       expect(input.value).toBe("-5");
+      expect(input).toHaveAttribute("data-invalid", "true");
 
       await userEvent.tab();
       expect(input.value).toBe("0");
+      expect(input).not.toHaveAttribute("data-invalid");
     });
 
     test("Negative values are automatically adjusted to the minimum allowed value (with typing)", async () => {
@@ -368,9 +373,11 @@ describe("NumberInput requirements", () => {
       await userEvent.clear(input);
       await userEvent.type(input, "-5");
       expect(input.value).toBe("-5");
+      expect(input).toHaveAttribute("data-invalid", "true");
 
       await userEvent.tab();
       expect(input.value).toBe("0");
+      expect(input).not.toHaveAttribute("data-invalid");
     });
 
     test("Decimal values are automatically rounded to the nearest integer", async () => {
@@ -384,8 +391,11 @@ describe("NumberInput requirements", () => {
       await userEvent.click(input);
       await userEvent.clear(input);
       await userEvent.type(input, "15.6");
+      expect(input).toHaveAttribute("data-invalid", "true");
+
       await userEvent.tab();
       expect(input.value).toBe("20");
+      expect(input).not.toHaveAttribute("data-invalid");
     });
 
     test("Invalid inputs (non-numeric) revert to the previous valid value", async () => {
@@ -399,25 +409,31 @@ describe("NumberInput requirements", () => {
       await userEvent.click(input);
       await userEvent.clear(input);
       await userEvent.type(input, "abc");
+      expect(input).toHaveAttribute("data-invalid", "true");
+
       await userEvent.tab();
       expect(input.value).toBe("0");
+      expect(input).not.toHaveAttribute("data-invalid");
     });
   });
 
   describe("validateNumber edge cases", () => {
     test("Infinity is adjusted to the maximum allowed value", async () => {
-      const value = validateNumber(Infinity, config);
-      expect(value).toBe(config.max);
+      const { result, hasError } = validateNumber(Infinity, config);
+      expect(result).toBe(config.max);
+      expect(hasError).toBe(true);
     });
 
     test("-Infinity is adjusted to the minimum allowed value", async () => {
-      const value = validateNumber(-Infinity, config);
-      expect(value).toBe(config.min);
+      const { result, hasError } = validateNumber(-Infinity, config);
+      expect(result).toBe(config.min);
+      expect(hasError).toBe(true);
     });
 
     test("NaN is adjusted to the minimum allowed value", async () => {
-      const value = validateNumber(NaN, config);
-      expect(value).toBe(config.min);
+      const { result, hasError } = validateNumber(NaN, config);
+      expect(result).toBe(config.min);
+      expect(hasError).toBe(true);
     });
   });
 });

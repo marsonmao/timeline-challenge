@@ -7,15 +7,34 @@ export type NumberConfig = {
 };
 
 export function validateNumber(rawTime: number, config: NumberConfig) {
-  let time = Math.round(rawTime / config.step) * config.step;
-  if (Number.isNaN(rawTime) || rawTime === -Infinity) {
-    time = config.min;
-  } else if (time === Infinity) {
-    time = config.max;
+  let hasError = false;
+  let result = rawTime;
+
+  hasError =
+    hasError ||
+    Number.isNaN(result) ||
+    result === -Infinity ||
+    result === Infinity;
+  if (hasError) {
+    if (Number.isNaN(result) || result === -Infinity) {
+      result = config.min;
+    } else if (result === Infinity) {
+      result = config.max;
+    }
   }
-  const result = Math.min(config.max, Math.max(config.min, time));
+
+  hasError = hasError || result < config.min || result > config.max;
+  if (hasError) {
+    result = Math.min(config.max, Math.max(config.min, result));
+  }
+
+  hasError = hasError || result % config.step !== 0;
+  if (hasError) {
+    result = Math.round(result / config.step) * config.step;
+  }
+
   return {
-    hasError: false,
+    hasError,
     result,
   };
 }
@@ -59,7 +78,7 @@ export function NumberInput({
   const handleValueChange = useCallback(
     (localValue: string) => {
       const rawValue = parseFloat(localValue);
-      const { result: validatedValue, hasError } = validator(rawValue, config);
+      const { result: validatedValue } = validator(rawValue, config);
       onChange(validatedValue);
       setLocalValue(validatedValue.toString());
     },
@@ -79,7 +98,9 @@ export function NumberInput({
       // }
       else {
         setLocalValue(e.target.value);
-        // TODO make invalid text red
+
+        const { hasError } = validator(parseFloat(e.target.value), config);
+        setHasError(hasError);
       }
     },
     [selectInputText, handleValueChange]
@@ -102,6 +123,7 @@ export function NumberInput({
 
     setIsEditing(false);
     blurTriggerKey.current = null;
+    setHasError(false);
   };
 
   const handleKeyDown = useCallback(
@@ -155,11 +177,12 @@ export function NumberInput({
   );
 
   const inputValue = isEditing ? localValue : valueString;
+  const displayError = hasError && isEditing;
 
   return (
     <input
       {...rest}
-      data-invalid={hasError ? "true" : "false"}
+      data-invalid={displayError ? "true" : undefined}
       className="bg-gray-700 px-1 rounded data-[invalid=true]:text-red-500"
       type="number"
       ref={inputElement}
