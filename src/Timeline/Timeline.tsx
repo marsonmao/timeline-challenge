@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { KeyframeListMemoed as KeyframeList } from "./KeyframeList";
 import { PlayControlsMemoed as PlayControls } from "./PlayControls";
 import { PlayheadMemoed as Playhead } from "./Playhead";
