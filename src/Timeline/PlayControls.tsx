@@ -22,7 +22,7 @@ export const PlayControls = () => {
         data-testid="play-controls"
       >
         <fieldset className="flex gap-1">
-          Current
+          <span className=" select-none">Current</span>
           <NumberInput
             value={currentTime}
             onChange={setCurrentTime}
@@ -31,7 +31,7 @@ export const PlayControls = () => {
             config={currentTimeConfig}
           />
         </fieldset>
-        -
+        <span className=" select-none">-</span>
         <fieldset className="flex gap-1">
           <NumberInput
             value={durationTime}
@@ -40,7 +40,7 @@ export const PlayControls = () => {
             validator={validateNumber}
             config={durationTimeConfig}
           />
-          Duration
+          <span className=" select-none">Duration</span>
         </fieldset>
       </div>
     </>
