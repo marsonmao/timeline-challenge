@@ -91,16 +91,16 @@ export function NumberInput({
       if (isSpinnerClicked.current || isArrowKeyDown.current) {
         handleValueChange(e.target.value);
         selectInputText();
-      }
-      // TODO this messes up the entering of "-" and "." etc.
-      // Need to find a better way to handle typing of e.g. A,B,C.
-      // else if (e.target.value === "") {
-      //   setLocalValue(min?.toString() ?? "0");
-      // }
-      else {
+      } else if (e.target.value === "") {
+        // Empty target value means the current input is not a valid number
+        setLocalValue(configLatest.current.min.toString() ?? "0");
+      } else {
         setLocalValue(e.target.value);
 
-        const { hasError } = validator(parseFloat(e.target.value), config);
+        const { hasError } = validator(
+          parseFloat(e.target.value),
+          configLatest.current
+        );
         setHasError(hasError);
       }
     },

@@ -2,6 +2,7 @@ import { fireEvent, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React, { createContext, useContext, useRef, useState } from "react";
 import { NumberInput, NumberInputProps, validateNumber } from "./NumberInput";
+import { clickAndType } from "./test-util";
 
 describe("NumberInput requirements", () => {
   type NumberContextValue = {
@@ -118,8 +119,7 @@ describe("NumberInput requirements", () => {
       await userEvent.click(input);
       expect(document.activeElement).toBe(input);
 
-      await userEvent.clear(input);
-      await userEvent.type(input, "25");
+      await clickAndType(input, "25");
       expect(onChangeSpy).toHaveBeenCalledTimes(0);
 
       await userEvent.click(container);
@@ -214,8 +214,7 @@ describe("NumberInput requirements", () => {
       expect(document.activeElement).toBe(input);
       expect(onChangeSpy).toHaveBeenCalledTimes(0);
 
-      await userEvent.clear(input);
-      await userEvent.type(input, "45");
+      await clickAndType(input, "45");
       expect(onChangeSpy).toHaveBeenCalledTimes(0);
 
       await userEvent.keyboard("{Enter}");
@@ -241,8 +240,7 @@ describe("NumberInput requirements", () => {
       expect(document.activeElement).toBe(input);
       expect(onChangeSpy).toHaveBeenCalledTimes(0);
 
-      await userEvent.clear(input);
-      await userEvent.type(input, "15");
+      await clickAndType(input, "15");
       expect(input.value).toBe("15");
       expect(onChangeSpy).toHaveBeenCalledTimes(0);
 
@@ -322,8 +320,7 @@ describe("NumberInput requirements", () => {
       await userEvent.click(input);
       expect(document.activeElement).toBe(input);
 
-      await userEvent.clear(input);
-      await userEvent.type(input, "55");
+      await clickAndType(input, "55");
       await userEvent.keyboard("{Escape}");
       expect(input.value).toBe("50");
       expect(document.activeElement).not.toBe(input);
@@ -358,9 +355,7 @@ describe("NumberInput requirements", () => {
       await userEvent.click(input2);
       expect(input1.value).toBe("50");
 
-      await userEvent.click(input1);
-      await userEvent.clear(input1);
-      await userEvent.type(input1, "100");
+      await clickAndType(input1, "100");
       await userEvent.keyboard("{Enter}");
       expect(input1.value).toBe("100");
       expect(input2.value).toBe("100");
@@ -379,9 +374,7 @@ describe("NumberInput requirements", () => {
       );
       const input = getByRole("spinbutton") as HTMLInputElement;
 
-      await userEvent.click(input);
-      await userEvent.clear(input);
-      await userEvent.type(input, "00100");
+      await clickAndType(input, "00100");
       expect(input).not.toHaveAttribute("data-invalid"); // Currently count as valid because this can represent a number
 
       await userEvent.tab();
@@ -415,10 +408,8 @@ describe("NumberInput requirements", () => {
       );
       const input = getByRole("spinbutton") as HTMLInputElement;
 
-      await userEvent.click(input);
-      await userEvent.clear(input);
-      await userEvent.type(input, "-5");
-      expect(input.value).toBe("-5");
+      await clickAndType(input, "-4");
+      expect(input.value).toBe("4"); // Because typing "-" is non effective
       expect(input).toHaveAttribute("data-invalid", "true");
 
       await userEvent.tab();
@@ -434,9 +425,7 @@ describe("NumberInput requirements", () => {
       );
       const input = getByRole("spinbutton") as HTMLInputElement;
 
-      await userEvent.click(input);
-      await userEvent.clear(input);
-      await userEvent.type(input, "15.6");
+      await clickAndType(input, "15.6");
       expect(input).toHaveAttribute("data-invalid", "true");
 
       await userEvent.tab();
@@ -446,16 +435,16 @@ describe("NumberInput requirements", () => {
 
     test("Invalid inputs (non-numeric) revert to the previous valid value", async () => {
       const { getByRole } = render(
-        <NumberProvider initialValue={10}>
+        <NumberProvider initialValue={0}>
           <NumberInputWrapper validator={validatorSpy} config={config} />
         </NumberProvider>
       );
       const input = getByRole("spinbutton") as HTMLInputElement;
+      expect(input.value).toBe("0");
 
-      await userEvent.click(input);
-      await userEvent.clear(input);
-      await userEvent.type(input, "abc");
-      expect(input).toHaveAttribute("data-invalid", "true");
+      await clickAndType(input, "abc"); // All these keys are non-effective
+      expect(input.value).toBe("0");
+      expect(input).not.toHaveAttribute("data-invalid");
 
       await userEvent.tab();
       expect(input.value).toBe("0");
