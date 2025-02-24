@@ -1,5 +1,6 @@
-import { memo } from "react";
+import { forwardRef, memo } from "react";
 import { RenderTracker } from "./RenderTracker";
+import { ScrollSyncElement } from "./useScroll";
 
 const Track = ({ name }: { name: string }) => {
   return (
@@ -9,31 +10,35 @@ const Track = ({ name }: { name: string }) => {
   );
 };
 
-export const TrackList = () => {
-  // TODO: implement scroll sync with `KeyframeList`
+export type TrackListProps = ScrollSyncElement;
 
-  return (
-    <>
-      <RenderTracker dataTestId="track-list-render-tracker" />
-      <div
-        className="grid grid-flow-row auto-rows-[40px]
+export const TrackList = forwardRef<HTMLDivElement, TrackListProps>(
+  ({ onScroll }, ref) => {
+    return (
+      <>
+        <RenderTracker dataTestId="track-list-render-tracker" />
+        <div
+          className="grid grid-flow-row auto-rows-[40px]
       border-r border-solid border-r-gray-700 
       overflow-auto"
-        data-testid="track-list"
-      >
-        <Track name="Track A" />
-        <Track name="Track B" />
-        <Track name="Track C" />
-        <Track name="Track D" />
-        <Track name="Track E" />
-        <Track name="Track F" />
-        <Track name="Track G" />
-        <Track name="Track H" />
-        <Track name="Track I" />
-        <Track name="Track J" />
-      </div>
-    </>
-  );
-};
+          data-testid="track-list"
+          ref={ref}
+          onScroll={onScroll}
+        >
+          <Track name="Track A" />
+          <Track name="Track B" />
+          <Track name="Track C" />
+          <Track name="Track D" />
+          <Track name="Track E" />
+          <Track name="Track F" />
+          <Track name="Track G" />
+          <Track name="Track H" />
+          <Track name="Track I" />
+          <Track name="Track J" />
+        </div>
+      </>
+    );
+  }
+);
 
 export const TrackListMemoed = memo(TrackList);
