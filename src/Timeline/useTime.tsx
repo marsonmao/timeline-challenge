@@ -1,5 +1,6 @@
 import { useCallback, useContext } from "react";
 import { TimeContext } from "./TimeContext";
+import { useLatest } from "./useLatest";
 
 export const useTime = () => {
   const {
@@ -12,16 +13,18 @@ export const useTime = () => {
     durationTimeConfig,
   } = useContext(TimeContext);
 
+  const currentTimeLatest = useLatest(currentTime);
+  const currentTimeConfigLatest = useLatest(currentTimeConfig);
   const setDurationTimeAndCapCurrentTime = useCallback(
     (durationTimeValue: number) => {
       setDurationTime(durationTimeValue);
-      setCurrentTime(Math.min(currentTime, durationTimeValue));
+      setCurrentTime(Math.min(currentTimeLatest.current, durationTimeValue));
       setCurrentTimeConfig({
-        ...currentTimeConfig,
+        ...currentTimeConfigLatest.current,
         max: durationTimeValue,
       });
     },
-    [currentTime, currentTimeConfig]
+    []
   );
 
   return {

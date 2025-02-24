@@ -4,39 +4,41 @@ import { useTime } from "./useTime";
 import { validateNumber } from "./NumberInput";
 import { ScrollSyncElement } from "./useScroll";
 import { useThrottleFn } from "./useThrottleFn";
+import { useLatest } from "./useLatest";
 
 export type RulerProps = ScrollSyncElement;
 
 export const Ruler = forwardRef<HTMLDivElement, RulerProps>(
   ({ onScroll }, ref) => {
     const { setCurrentTime, currentTimeConfig, durationTime } = useTime();
+    const currentTimeConfigLatest = useLatest(currentTimeConfig);
 
     const handleClick = useCallback<
       NonNullable<React.DOMAttributes<HTMLDivElement>["onClick"]>
-    >(
-      (e) => {
-        const { left } = e.currentTarget.getBoundingClientRect();
-        const clickX = e.clientX - left;
-        const millisecond = validateNumber(clickX, currentTimeConfig);
-        setCurrentTime(millisecond.result);
-      },
-      [currentTimeConfig]
-    );
+    >((e) => {
+      const { left } = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - left;
+      const millisecond = validateNumber(
+        clickX,
+        currentTimeConfigLatest.current
+      );
+      setCurrentTime(millisecond.result);
+    }, []);
 
     const handleMouseMove = useCallback<
       NonNullable<React.DOMAttributes<HTMLDivElement>["onMouseMove"]>
-    >(
-      (e) => {
-        if (e.buttons === 1) {
-          const { left } = e.currentTarget.getBoundingClientRect();
-          const mouseX = e.clientX - left;
-          const millisecond = validateNumber(mouseX, currentTimeConfig);
-          setCurrentTime(millisecond.result);
-        }
-      },
-      [currentTimeConfig]
-    );
-    const [handleMouseMoveThrottled] = useThrottleFn(handleMouseMove, 32);
+    >((e) => {
+      if (e.buttons === 1) {
+        const { left } = e.currentTarget.getBoundingClientRect();
+        const mouseX = e.clientX - left;
+        const millisecond = validateNumber(
+          mouseX,
+          currentTimeConfigLatest.current
+        );
+        setCurrentTime(millisecond.result);
+      }
+    }, []);
+    const [handleMouseMoveThrottled] = useThrottleFn(handleMouseMove, 32); // 30FPS
 
     return (
       <>

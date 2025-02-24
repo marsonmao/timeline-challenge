@@ -1,4 +1,5 @@
-import { useCallback, useRef } from "react";
+import { useCallback } from "react";
+import { useLatest } from "./useLatest";
 
 export type ScrollSyncElement = Pick<
   React.DOMAttributes<HTMLElement>,
@@ -32,10 +33,8 @@ export const useScroll = ({
   scrollXElements,
   scrollYElements,
 }: UseScrollProps) => {
-  const scrollXElementsLatest = useRef(scrollXElements);
-  const scrollYElementsLatest = useRef(scrollYElements);
-  scrollXElementsLatest.current = scrollXElements;
-  scrollYElementsLatest.current = scrollYElements;
+  const scrollXElementsLatest = useLatest(scrollXElements);
+  const scrollYElementsLatest = useLatest(scrollYElements);
 
   const syncScrollX = useCallback<
     NonNullable<React.DOMAttributes<HTMLElement>["onScroll"]>

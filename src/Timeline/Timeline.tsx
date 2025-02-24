@@ -11,17 +11,14 @@ export const Timeline = () => {
   /**
    * Time context
    */
-  const durationTimeConfig = useMemo<TimeConfig>(
-    () => ({
-      /**
-       * In unit of Milliseconds
-       */
-      step: 10,
-      min: 100,
-      max: 6000,
-    }),
-    []
-  );
+  const durationTimeConfig: TimeConfig = {
+    /**
+     * In unit of Milliseconds
+     */
+    step: 10,
+    min: 100,
+    max: 6000,
+  };
   const [currentTimeConfig, setCurrentTimeConfig] = useState<TimeConfig>({
     /**
      * In unit of Milliseconds
