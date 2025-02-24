@@ -51,9 +51,7 @@ export type NumberInputProps = {
     result: number;
   };
   config: NumberConfig;
-} & {
-  // TODO extract to a separate type
-  [key: `data-${string}`]: string | number | boolean | undefined;
+  "data-testid"?: string;
 };
 
 export function NumberInput({
