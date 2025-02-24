@@ -1,5 +1,5 @@
 import { useCallback, useContext } from "react";
-import { TimelineContext } from "./TimelineContext";
+import { TimeContext } from "./TimeContext";
 
 export const useTime = () => {
   const {
@@ -10,7 +10,7 @@ export const useTime = () => {
     durationTime,
     setDurationTime,
     durationTimeConfig,
-  } = useContext(TimelineContext);
+  } = useContext(TimeContext);
 
   const setDurationTimeAndCapCurrentTime = useCallback(
     (durationTimeValue: number) => {

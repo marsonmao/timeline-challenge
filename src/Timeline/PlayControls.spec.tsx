@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { PropsWithChildren, useState } from "react";
 import { PlayControls } from "./PlayControls";
-import { TimelineContext } from "./TimelineContext";
+import { TimeContext } from "./TimeContext";
 
 describe("PlayControls requirements", () => {
   const TimelineProvider = ({
@@ -18,7 +18,7 @@ describe("PlayControls requirements", () => {
     const currentTimeConfig = { step: 10, min: 0, max: 6000 };
     const durationTimeConfig = { step: 10, min: 100, max: 6000 };
     return (
-      <TimelineContext.Provider
+      <TimeContext.Provider
         value={{
           currentTime,
           setCurrentTime,
@@ -30,7 +30,7 @@ describe("PlayControls requirements", () => {
         }}
       >
         {children}
-      </TimelineContext.Provider>
+      </TimeContext.Provider>
     );
   };
 

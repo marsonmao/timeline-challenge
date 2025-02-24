@@ -1,9 +1,9 @@
 import { memo, useContext } from "react";
-import { TimelineContext } from "./TimelineContext";
+import { TimeContext } from "./TimeContext";
 import { RenderTracker } from "./RenderTracker";
 
 export const Playhead = () => {
-  const { currentTime } = useContext(TimelineContext);
+  const { currentTime } = useContext(TimeContext);
 
   return (
     <>

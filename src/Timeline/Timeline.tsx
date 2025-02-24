@@ -4,7 +4,7 @@ import { RulerMemoed as Ruler } from "./Ruler";
 import { TrackListMemoed as TrackList } from "./TrackList";
 import { KeyframeListMemoed as KeyframeList } from "./KeyframeList";
 import { PlayControlsMemoed as PlayControls } from "./PlayControls";
-import { TimeConfig, TimelineContext } from "./TimelineContext";
+import { TimeConfig, TimeContext } from "./TimeContext";
 
 export const Timeline = () => {
   const durationTimeConfig = useMemo<TimeConfig>(
@@ -28,7 +28,7 @@ export const Timeline = () => {
   });
   const [currentTime, setCurrentTime] = useState(currentTimeConfig.min);
   const [durationTime, setDurationTime] = useState(durationTimeConfig.max);
-  const timelineContextValue = {
+  const timeContextValue = {
     currentTime,
     setCurrentTime,
     currentTimeConfig,
@@ -44,13 +44,13 @@ export const Timeline = () => {
     bg-gray-800 border-t-2 border-solid border-gray-700"
       data-testid="timeline"
     >
-      <TimelineContext.Provider value={timelineContextValue}>
+      <TimeContext.Provider value={timeContextValue}>
         <PlayControls />
         <Ruler />
         <TrackList />
         <KeyframeList />
         <Playhead />
-      </TimelineContext.Provider>
+      </TimeContext.Provider>
     </div>
   );
 };
