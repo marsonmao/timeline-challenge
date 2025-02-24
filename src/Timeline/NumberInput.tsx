@@ -19,7 +19,7 @@ export function validateNumber(rawTime: number, config: NumberConfig) {
   if (hasError) {
     if (Number.isNaN(result) || result === -Infinity) {
       result = config.min;
-    } else if (result === Infinity) {
+    } else {
       result = config.max;
     }
   }
@@ -116,10 +116,7 @@ export function NumberInput({
   const handleBlur = () => {
     if (blurTriggerKey.current === "Escape") {
       setLocalValue(valueString);
-    } else if (
-      blurTriggerKey.current === "Enter" ||
-      blurTriggerKey.current === null
-    ) {
+    } else {
       handleValueChange(localValue);
     }
 
