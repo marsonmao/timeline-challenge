@@ -30,7 +30,7 @@ test("the components subscribed to the time state should render accordingly, whi
   // Initial render
   expect(playControlsRenderTracker.textContent).toBe("1");
   expect(rulerRenderTracker.textContent).toBe("1");
-  expect(playheadRenderTracker.textContent).toBe("1");
+  expect(playheadRenderTracker.textContent).toBe("2"); // useInView created 2 render
   expect(trackListRenderTracker.textContent).toBe("1");
   expect(keyframeListRenderTracker.textContent).toBe("1");
 
@@ -38,7 +38,7 @@ test("the components subscribed to the time state should render accordingly, whi
   await userEvent.type(currentTimeInput, "20");
   await userEvent.keyboard("{Enter}");
   expect(playControlsRenderTracker.textContent).toBe("2");
-  expect(playheadRenderTracker.textContent).toBe("2");
+  expect(playheadRenderTracker.textContent).toBe("3");
   expect(rulerRenderTracker.textContent).toBe("2");
   expect(trackListRenderTracker.textContent).toBe("1");
   expect(keyframeListRenderTracker.textContent).toBe("1");

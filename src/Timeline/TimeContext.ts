@@ -6,7 +6,7 @@ export type TimeConfig = {
   max: number;
 };
 
-export type TimelineContext = {
+export type TimeContext = {
   currentTime: number;
   setCurrentTime: (v: number) => void;
   currentTimeConfig: TimeConfig;
@@ -16,7 +16,7 @@ export type TimelineContext = {
   durationTimeConfig: TimeConfig;
 };
 
-export const TimelineContext = createContext<TimelineContext>({
+export const TimeContext = createContext<TimeContext>({
   currentTime: 0,
   setCurrentTime: () => {},
   currentTimeConfig: { step: 1, min: 0, max: 100 },

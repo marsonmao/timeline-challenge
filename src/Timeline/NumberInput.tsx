@@ -1,4 +1,5 @@
 import React, { useCallback, useRef, useState } from "react";
+import { useLatest } from "./useLatest";
 
 export type NumberConfig = {
   step: number;
@@ -75,15 +76,17 @@ export function NumberInput({
     inputElement.current?.select();
   }, []);
 
-  const handleValueChange = useCallback(
-    (localValue: string) => {
-      const rawValue = parseFloat(localValue);
-      const { result: validatedValue } = validator(rawValue, config);
-      onChange(validatedValue);
-      setLocalValue(validatedValue.toString());
-    },
-    [config, onChange]
-  );
+  const configLatest = useLatest(config);
+  const onChangeLatest = useLatest(onChange);
+  const handleValueChange = useCallback((localValue: string) => {
+    const rawValue = parseFloat(localValue);
+    const { result: validatedValue } = validator(
+      rawValue,
+      configLatest.current
+    );
+    onChangeLatest.current(validatedValue);
+    setLocalValue(validatedValue.toString());
+  }, []);
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

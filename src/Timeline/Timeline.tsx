@@ -1,23 +1,24 @@
-import { useMemo, useState } from "react";
-import { PlayheadMemoed as Playhead } from "./Playhead";
-import { RulerMemoed as Ruler } from "./Ruler";
-import { TrackListMemoed as TrackList } from "./TrackList";
+import { useMemo, useRef, useState } from "react";
 import { KeyframeListMemoed as KeyframeList } from "./KeyframeList";
 import { PlayControlsMemoed as PlayControls } from "./PlayControls";
-import { TimeConfig, TimelineContext } from "./TimelineContext";
+import { PlayheadMemoed as Playhead } from "./Playhead";
+import { RulerMemoed as Ruler } from "./Ruler";
+import { TimeConfig, TimeContext } from "./TimeContext";
+import { TrackListMemoed as TrackList } from "./TrackList";
+import { useScroll } from "./useScroll";
 
 export const Timeline = () => {
-  const durationTimeConfig = useMemo<TimeConfig>(
-    () => ({
-      /**
-       * In unit of Milliseconds
-       */
-      step: 10,
-      min: 100,
-      max: 6000,
-    }),
-    []
-  );
+  /**
+   * Time context
+   */
+  const durationTimeConfig: TimeConfig = {
+    /**
+     * In unit of Milliseconds
+     */
+    step: 10,
+    min: 100,
+    max: 6000,
+  };
   const [currentTimeConfig, setCurrentTimeConfig] = useState<TimeConfig>({
     /**
      * In unit of Milliseconds
@@ -28,7 +29,7 @@ export const Timeline = () => {
   });
   const [currentTime, setCurrentTime] = useState(currentTimeConfig.min);
   const [durationTime, setDurationTime] = useState(durationTimeConfig.max);
-  const timelineContextValue = {
+  const timeContextValue = {
     currentTime,
     setCurrentTime,
     currentTimeConfig,
@@ -38,19 +39,38 @@ export const Timeline = () => {
     durationTimeConfig,
   };
 
+  /**
+   * Scroll behavior
+   */
+  const rulerRef = useRef<HTMLDivElement>(null);
+  const keyframeListRef = useRef<HTMLDivElement>(null);
+  const trackListRef = useRef<HTMLDivElement>(null);
+  const playheadRef = useRef<HTMLDivElement>(null);
+  const { syncScrollX, syncScrollY, syncBothScroll } = useScroll({
+    scrollXElements: [
+      () => rulerRef.current,
+      () => keyframeListRef.current,
+      () => playheadRef.current,
+    ],
+    scrollYElements: [
+      () => keyframeListRef.current,
+      () => trackListRef.current,
+    ],
+  });
+
   return (
     <div
       className="relative h-[300px] w-full grid grid-cols-[300px_1fr] grid-rows-[40px_1fr] 
     bg-gray-800 border-t-2 border-solid border-gray-700"
       data-testid="timeline"
     >
-      <TimelineContext.Provider value={timelineContextValue}>
+      <TimeContext.Provider value={timeContextValue}>
         <PlayControls />
-        <Ruler />
-        <TrackList />
-        <KeyframeList />
-        <Playhead />
-      </TimelineContext.Provider>
+        <Ruler ref={rulerRef} onScroll={syncScrollX} />
+        <TrackList ref={trackListRef} onScroll={syncScrollY} />
+        <KeyframeList ref={keyframeListRef} onScroll={syncBothScroll} />
+        <Playhead ref={playheadRef} />
+      </TimeContext.Provider>
     </div>
   );
 };
