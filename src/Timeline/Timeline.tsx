@@ -48,8 +48,13 @@ export const Timeline = () => {
   const rulerRef = useRef<HTMLDivElement>(null);
   const keyframeListRef = useRef<HTMLDivElement>(null);
   const trackListRef = useRef<HTMLDivElement>(null);
+  const playheadRef = useRef<HTMLDivElement>(null);
   const { syncScrollX, syncScrollY, syncBothScroll } = useScroll({
-    scrollXElements: [() => rulerRef.current, () => keyframeListRef.current],
+    scrollXElements: [
+      () => rulerRef.current,
+      () => keyframeListRef.current,
+      () => playheadRef.current,
+    ],
     scrollYElements: [
       () => keyframeListRef.current,
       () => trackListRef.current,
@@ -67,7 +72,7 @@ export const Timeline = () => {
         <Ruler ref={rulerRef} onScroll={syncScrollX} />
         <TrackList ref={trackListRef} onScroll={syncScrollY} />
         <KeyframeList ref={keyframeListRef} onScroll={syncBothScroll} />
-        <Playhead />
+        <Playhead ref={playheadRef} />
       </TimeContext.Provider>
     </div>
   );

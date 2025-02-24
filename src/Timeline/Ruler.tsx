@@ -9,7 +9,6 @@ export type RulerProps = ScrollSyncElement;
 
 export const Ruler = forwardRef<HTMLDivElement, RulerProps>(
   ({ onScroll }, ref) => {
-    // TODO: implement mousedown and mousemove Playhead position
     const { setCurrentTime, currentTimeConfig, durationTime } = useTime();
 
     const handleClick = useCallback<
