@@ -1,9 +1,16 @@
 import { forwardRef, memo, useContext } from "react";
+import { useInView } from "react-intersection-observer";
 import { RenderTracker } from "./RenderTracker";
 import { TimeContext } from "./TimeContext";
 
 export const Playhead = forwardRef<HTMLDivElement>((_props, ref) => {
   const { currentTime, durationTime } = useContext(TimeContext);
+  const { ref: inViewRef, inView } = useInView({
+    threshold: 0,
+  });
+  const playheadStyle = {
+    transform: `translateX(calc(${currentTime}px - 50%))`,
+  };
 
   return (
     <>
@@ -19,10 +26,16 @@ export const Playhead = forwardRef<HTMLDivElement>((_props, ref) => {
           }}
         ></div>
         <div
+          className="absolute top-0 h-[2px] w-[2px] bg-transparent"
+          ref={inViewRef}
+          style={playheadStyle}
+        ></div>
+        <div
           className="absolute top-0 h-full border-l-2 border-solid border-yellow-600 z-10"
           data-testid="playhead"
-          style={{ transform: `translateX(calc(${currentTime}px - 50%))` }}
+          style={playheadStyle}
           ref={ref}
+          hidden={!inView}
         >
           <div className="absolute border-solid border-[5px] border-transparent border-t-yellow-600 -translate-x-1.5" />
         </div>
