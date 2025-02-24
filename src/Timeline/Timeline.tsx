@@ -8,6 +8,9 @@ import { TrackListMemoed as TrackList } from "./TrackList";
 import { useScroll } from "./useScroll";
 
 export const Timeline = () => {
+  /**
+   * Time context
+   */
   const durationTimeConfig = useMemo<TimeConfig>(
     () => ({
       /**
@@ -38,6 +41,10 @@ export const Timeline = () => {
     setDurationTime,
     durationTimeConfig,
   };
+
+  /**
+   * Scroll behavior
+   */
   const rulerRef = useRef<HTMLDivElement>(null);
   const keyframeListRef = useRef<HTMLDivElement>(null);
   const trackListRef = useRef<HTMLDivElement>(null);
