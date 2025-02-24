@@ -93,7 +93,8 @@ export function NumberInput({
         selectInputText();
       } else if (e.target.value === "") {
         // Empty target value means the current input is not a valid number
-        setLocalValue(configLatest.current.min.toString() ?? "0");
+        setLocalValue(configLatest.current.min.toString());
+        setHasError(false);
       } else {
         setLocalValue(e.target.value);
 

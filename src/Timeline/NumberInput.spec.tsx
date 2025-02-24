@@ -451,6 +451,24 @@ describe("NumberInput requirements", () => {
       expect(input).not.toHaveAttribute("data-invalid");
     });
 
+    test("Incomplete number representation changes to to the minimum allowed value", async () => {
+      const { getByRole } = render(
+        <NumberProvider initialValue={10}>
+          <NumberInputWrapper validator={validatorSpy} config={config} />
+        </NumberProvider>
+      );
+      const input = getByRole("spinbutton") as HTMLInputElement;
+      expect(input.value).toBe("10");
+
+      await clickAndType(input, "1e");
+      expect(input.value).toBe("0");
+      expect(input).not.toHaveAttribute("data-invalid");
+
+      await userEvent.tab();
+      expect(input.value).toBe("0");
+      expect(input).not.toHaveAttribute("data-invalid");
+    });
+
     test("If config changes, the validation result should reflect it accordingly", async () => {
       const config1 = {
         step: 1,
