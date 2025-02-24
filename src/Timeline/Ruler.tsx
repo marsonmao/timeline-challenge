@@ -3,6 +3,7 @@ import { RenderTracker } from "./RenderTracker";
 import { useTime } from "./useTime";
 import { validateNumber } from "./NumberInput";
 import { ScrollSyncElement } from "./useScroll";
+import { useThrottleFn } from "./useThrottleFn";
 
 export type RulerProps = ScrollSyncElement;
 
@@ -36,6 +37,7 @@ export const Ruler = forwardRef<HTMLDivElement, RulerProps>(
       },
       [currentTimeConfig]
     );
+    const [handleMouseMoveThrottled] = useThrottleFn(handleMouseMove, 32);
 
     return (
       <>
@@ -55,7 +57,7 @@ export const Ruler = forwardRef<HTMLDivElement, RulerProps>(
               width: `${durationTime}px`,
             }}
             onClick={handleClick}
-            onMouseMove={handleMouseMove}
+            onMouseMove={handleMouseMoveThrottled}
           ></div>
         </div>
       </>
