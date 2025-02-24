@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { PropsWithChildren, useState } from "react";
 import { PlayControls } from "./PlayControls";
 import { TimeContext } from "./TimeContext";
+import { clickAndType } from "./test-util";
 
 describe("PlayControls requirements", () => {
   const TimelineProvider = ({
@@ -50,14 +51,12 @@ describe("PlayControls requirements", () => {
     expect(parseInt(currentInput.value, 10)).toBeGreaterThanOrEqual(0);
     expect(parseInt(currentInput.value, 10)).toBeLessThanOrEqual(durationTime);
 
-    await userEvent.clear(currentInput);
-    await userEvent.type(currentInput, "-50");
+    await clickAndType(currentInput, "-50");
     await userEvent.tab();
     expect(parseInt(currentInput.value, 10)).toBeGreaterThanOrEqual(0);
     expect(parseInt(currentInput.value, 10)).toBeLessThanOrEqual(durationTime);
 
-    await userEvent.clear(currentInput);
-    await userEvent.type(currentInput, "7000");
+    await clickAndType(currentInput, "7000");
     await userEvent.tab();
     expect(parseInt(currentInput.value, 10)).toBeGreaterThanOrEqual(0);
     expect(parseInt(currentInput.value, 10)).toBeLessThanOrEqual(durationTime);
@@ -77,9 +76,9 @@ describe("PlayControls requirements", () => {
       "duration-input"
     ) as HTMLInputElement;
 
-    await userEvent.clear(durationInput);
-    await userEvent.type(durationInput, "4000");
+    await clickAndType(durationInput, "4000");
     await userEvent.tab();
+    expect(parseInt(durationInput.value, 10)).toBe(4000);
     expect(parseInt(currentInput.value, 10)).toBe(4000);
   });
 
@@ -95,14 +94,13 @@ describe("PlayControls requirements", () => {
     expect(parseInt(durationInput.value, 10)).toBeGreaterThanOrEqual(100);
     expect(parseInt(durationInput.value, 10)).toBeLessThanOrEqual(6000);
 
-    await userEvent.clear(durationInput);
-    await userEvent.type(durationInput, "50");
+    await clickAndType(durationInput, "50");
     await userEvent.tab();
+    expect(parseInt(durationInput.value, 10)).toBe(100);
     expect(parseInt(durationInput.value, 10)).toBeGreaterThanOrEqual(100);
     expect(parseInt(durationInput.value, 10)).toBeLessThanOrEqual(6000);
 
-    await userEvent.clear(durationInput);
-    await userEvent.type(durationInput, "7000");
+    await clickAndType(durationInput, "7000");
     await userEvent.tab();
     expect(parseInt(durationInput.value, 10)).toBeGreaterThanOrEqual(100);
     expect(parseInt(durationInput.value, 10)).toBeLessThanOrEqual(6000);
@@ -122,8 +120,7 @@ describe("PlayControls requirements", () => {
     ) as HTMLInputElement;
 
     const fillThis = async (input: HTMLInputElement, value: string) => {
-      await userEvent.clear(input);
-      await userEvent.type(input, value);
+      await clickAndType(input, value);
       await userEvent.tab();
     };
 

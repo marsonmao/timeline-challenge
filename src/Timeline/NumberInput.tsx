@@ -19,7 +19,7 @@ export function validateNumber(rawTime: number, config: NumberConfig) {
   if (hasError) {
     if (Number.isNaN(result) || result === -Infinity) {
       result = config.min;
-    } else if (result === Infinity) {
+    } else {
       result = config.max;
     }
   }
@@ -51,9 +51,7 @@ export type NumberInputProps = {
     result: number;
   };
   config: NumberConfig;
-} & {
-  // TODO extract to a separate type
-  [key: `data-${string}`]: string | number | boolean | undefined;
+  "data-testid"?: string;
 };
 
 export function NumberInput({
@@ -93,16 +91,17 @@ export function NumberInput({
       if (isSpinnerClicked.current || isArrowKeyDown.current) {
         handleValueChange(e.target.value);
         selectInputText();
-      }
-      // TODO this messes up the entering of "-" and "." etc.
-      // Need to find a better way to handle typing of e.g. A,B,C.
-      // else if (e.target.value === "") {
-      //   setLocalValue(min?.toString() ?? "0");
-      // }
-      else {
+      } else if (e.target.value === "") {
+        // Empty target value means the current input is not a valid number
+        setLocalValue(configLatest.current.min.toString());
+        setHasError(false);
+      } else {
         setLocalValue(e.target.value);
 
-        const { hasError } = validator(parseFloat(e.target.value), config);
+        const { hasError } = validator(
+          parseFloat(e.target.value),
+          configLatest.current
+        );
         setHasError(hasError);
       }
     },
@@ -118,10 +117,7 @@ export function NumberInput({
   const handleBlur = () => {
     if (blurTriggerKey.current === "Escape") {
       setLocalValue(valueString);
-    } else if (
-      blurTriggerKey.current === "Enter" ||
-      blurTriggerKey.current === null
-    ) {
+    } else {
       handleValueChange(localValue);
     }
 
