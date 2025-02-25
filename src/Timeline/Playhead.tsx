@@ -17,7 +17,7 @@ export const Playhead = forwardRef<HTMLDivElement>((_props, ref) => {
     <>
       <RenderTracker dataTestId="playhead-render-tracker" />
       <div
-        className="min-w-0 h-full pointer-events-none px-4 absolute left-[300px] top-0 right-0 bottom-0 overflow-x-auto overflow-y-hidden"
+        className="min-w-0 h-full pointer-events-none px-4 absolute left-[theme('spacing.timeline-column-1')] top-0 right-0 bottom-0 overflow-x-auto overflow-y-hidden"
         ref={ref}
       >
         <div
