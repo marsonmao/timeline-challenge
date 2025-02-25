@@ -2,7 +2,7 @@ import { fireEvent, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React, { createContext, useContext, useRef, useState } from "react";
 import { NumberInput, NumberInputProps, validateNumber } from "./NumberInput";
-import { clickAndType } from "./test-util";
+import { clickAndType, clickSpinner, pressArrowKey } from "./test-util";
 
 describe("NumberInput requirements", () => {
   type NumberContextValue = {
@@ -72,31 +72,6 @@ describe("NumberInput requirements", () => {
     Parameters<NumberInputProps["validator"]>
   >;
   let onChangeSpy: jest.Mock<void, [number]>;
-
-  // WORKAROUND: the correct behavior is not simulated by JSDOM
-  function clickSpinner(
-    spinner: HTMLElement,
-    button: "increment" | "decrement",
-    currentValue: number,
-    step: number
-  ) {
-    const value =
-      button === "increment" ? currentValue + step : currentValue - step;
-    fireEvent.mouseDown(spinner, { button: 0 });
-    fireEvent.change(spinner, { target: { value } });
-  }
-
-  // WORKAROUND: the correct behavior is not simulated by JSDOM
-  function pressArrowKey(
-    input: HTMLElement,
-    key: "ArrowUp" | "ArrowDown",
-    currentValue: number,
-    step: number
-  ) {
-    const value = key === "ArrowUp" ? currentValue + step : currentValue - step;
-    fireEvent.keyDown(input, { key });
-    fireEvent.change(input, { target: { value } });
-  }
 
   beforeEach(() => {
     validatorSpy = jest.fn(validateNumber);
