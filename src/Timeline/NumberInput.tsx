@@ -69,13 +69,9 @@ export function NumberInput({
   const isArrowKeyDown = useRef(false);
   const blurTriggerKey = useRef<string | null>(null);
   const [hasError, setHasError] = useState(false);
-
-  const selectInputText = useCallback(() => {
-    inputElement.current?.select();
-  }, []);
-
   const configLatest = useLatest(config);
   const onChangeLatest = useLatest(onChange);
+
   const handleValueChange = useCallback((localValue: string) => {
     const rawValue = parseFloat(localValue);
     const { result: validatedValue } = validator(
@@ -84,6 +80,10 @@ export function NumberInput({
     );
     onChangeLatest.current(validatedValue);
     setLocalValue(validatedValue.toString());
+  }, []);
+
+  const selectInputText = useCallback(() => {
+    inputElement.current?.select();
   }, []);
 
   const handleChange = useCallback(
