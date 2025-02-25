@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useThrottleFn } from "./useThrottleFn";
+import { useThrottleCallback } from "@react-hook/throttle";
 
 export const useDragging = ({ fps = 60 }: { fps?: 30 | 60 }) => {
   const [isDragging, setIsDragging] = useState(false);
@@ -35,9 +35,10 @@ export const useDragging = ({ fps = 60 }: { fps?: 30 | 60 }) => {
     setLocalCurrentPosition(localPosition);
     setGlobalCurrentPosition(globalPosition);
   }, []);
-  const [updatePositionsThrottled] = useThrottleFn(
+  const updatePositionsThrottled = useThrottleCallback(
     updatePositions,
-    fps === 30 ? 32 : 16
+    fps === 30 ? 32 : 16,
+    true
   );
 
   const startDragging = useCallback<
