@@ -8,8 +8,9 @@ export const Playhead = forwardRef<HTMLDivElement>((_props, ref) => {
   const { ref: inViewRef, inView } = useInView({
     threshold: 0,
   });
-  const playheadStyle = {
+  const playheadStyle: React.HTMLAttributes<HTMLDivElement>["style"] = {
     transform: `translateX(calc(${currentTime}px - 50%))`,
+    transition: "transform 0.1s",
   };
 
   return (
