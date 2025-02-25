@@ -52,7 +52,7 @@ export const Ruler = forwardRef<HTMLDivElement, RulerProps>(
           onScroll={onScroll}
         >
           <div
-            className="h-6 rounded-md bg-white/25 cursor-pointer"
+            className="h-6 rounded-md bg-white/25"
             data-testid="ruler-bar"
             style={{
               width: `${durationTime}px`,
