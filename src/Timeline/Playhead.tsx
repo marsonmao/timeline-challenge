@@ -19,6 +19,7 @@ export const Playhead = forwardRef<HTMLDivElement>((_props, ref) => {
       <div
         className="min-w-0 h-full pointer-events-none px-4 absolute left-[theme('spacing.timeline-column-1')] top-0 right-0 bottom-0 overflow-x-auto overflow-y-hidden"
         ref={ref}
+        data-testid="playhead-root"
       >
         <div
           style={{
