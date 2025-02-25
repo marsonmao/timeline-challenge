@@ -60,8 +60,12 @@ export const Timeline = () => {
 
   return (
     <div
-      className="relative h-[300px] w-full grid grid-cols-[300px_1fr] grid-rows-[40px_1fr] 
-    bg-gray-800 border-t-2 border-solid border-gray-700"
+      className="
+        relative 
+        h-[300px] w-full 
+        grid grid-cols-[theme('spacing.timeline-column-1')_1fr] grid-rows-[40px_1fr] 
+      bg-gray-800 border-t-2 border-solid border-gray-700
+      "
       data-testid="timeline"
     >
       <TimeContext.Provider value={timeContextValue}>

@@ -34,62 +34,62 @@ Implement interactive features for a Timeline component. We will provide a basic
 
 https://github.com/user-attachments/assets/8dd5ef2b-6b57-43dc-91b3-0d322d148781
 
-- [ ] The displayed value updates immediately while typing, but `onChange` is not triggered until input is confirmed
-- [ ] Clicking outside the input field removes focus and changes the value
-- [ ] Clicking on the native step buttons immediately changes the value
-- [ ] Pressing up arrow or down arrow keys immediately changes the value
-- [ ] Entire text is selected when the input field gains focus
-- [ ] Entire text is selected after using the native step buttons
-- [ ] Entire text is selected after using the up arrow or down arrow keys
-- [ ] Pressing Enter confirms the new value and removes focus
-- [ ] Pressing Escape reverts to the original value and removes focus
-- [ ] Leading zeros are automatically removed
-- [ ] Negative values are automatically adjusted to the minimum allowed value
-- [ ] Decimal values are automatically rounded to the nearest integer
-- [ ] Invalid inputs (non-numeric) revert to the previous valid value
+- [x] The displayed value updates immediately while typing, but `onChange` is not triggered until input is confirmed
+- [x] Clicking outside the input field removes focus and changes the value
+- [x] Clicking on the native step buttons immediately changes the value
+- [x] Pressing up arrow or down arrow keys immediately changes the value
+- [x] Entire text is selected when the input field gains focus
+- [x] Entire text is selected after using the native step buttons
+- [x] Entire text is selected after using the up arrow or down arrow keys
+- [x] Pressing Enter confirms the new value and removes focus
+- [x] Pressing Escape reverts to the original value and removes focus
+- [x] Leading zeros are automatically removed
+- [x] Negative values are automatically adjusted to the minimum allowed value
+- [x] Decimal values are automatically rounded to the nearest integer
+- [x] Invalid inputs (non-numeric) revert to the previous valid value
 
 ### 2. Play Controls Behavior
 
 https://github.com/user-attachments/assets/9a669854-e0c5-4950-8364-10fe0b40d16b
 
-- [ ] Current Time is always between `0ms` and the Duration
-- [ ] Current Time adjusts if it exceeds the newly set Duration
-- [ ] Duration is always between `100ms` and `6000ms`
-- [ ] Current Time and Duration are always multiples of `10ms`
-- [ ] Current Time and Duration are always positive integers
-- [ ] Playhead position updates only after specific actions on Current Time input (losing focus, pressing Enter, using arrow keys, or clicking up/down buttons)
+- [x] Current Time is always between `0ms` and the Duration
+- [x] Current Time adjusts if it exceeds the newly set Duration
+- [x] Duration is always between `100ms` and `6000ms`
+- [x] Current Time and Duration are always multiples of `10ms`
+- [x] Current Time and Duration are always positive integers
+- [x] Playhead position updates only after specific actions on Current Time input (losing focus, pressing Enter, using arrow keys, or clicking up/down buttons)
 
 ### 3. Ruler Behavior
 
 https://github.com/user-attachments/assets/42190ade-f708-45a1-8168-2be779c66390
 
-- [ ] Clicking or dragging on the Ruler updates the Current Time and Playhead position
-- [ ] Horizontal scrolling of the Ruler is synchronized with the Keyframe List
-- [ ] Ruler length visually represents the total Duration (`1ms = 1px`)
-- [ ] Ruler length updates only after specific actions on Duration input (losing focus, pressing Enter, using arrow keys, or clicking up/down buttons)
+- [x] Clicking or dragging on the Ruler updates the Current Time and Playhead position
+- [x] Horizontal scrolling of the Ruler is synchronized with the Keyframe List
+- [x] Ruler length visually represents the total Duration (`1ms = 1px`)
+- [x] Ruler length updates only after specific actions on Duration input (losing focus, pressing Enter, using arrow keys, or clicking up/down buttons)
 
 ### 4. Track List Behavior
 
 https://github.com/user-attachments/assets/94b5e2c8-ef32-488e-97e4-d53036bbf2f7
 
-- [ ] Vertical scrolling of the Track List is synchronized with the Keyframe List
+- [x] Vertical scrolling of the Track List is synchronized with the Keyframe List
 
 ### 5. Keyframe List Behavior
 
 https://github.com/user-attachments/assets/99826161-f821-4e4d-b9a8-b59c16d9894e
 
-- [ ] Vertical scrolling is synchronized with the Track List
-- [ ] Horizontal scrolling is synchronized with the Ruler
-- [ ] Segment length visually represents the total Duration (`1ms = 1px`)
-- [ ] Segment length updates only after specific actions on Duration input (losing focus, pressing Enter, using arrow keys, or clicking up/down buttons)
+- [x] Vertical scrolling is synchronized with the Track List
+- [x] Horizontal scrolling is synchronized with the Ruler
+- [x] Segment length visually represents the total Duration (`1ms = 1px`)
+- [x] Segment length updates only after specific actions on Duration input (losing focus, pressing Enter, using arrow keys, or clicking up/down buttons)
 
 ### 6. Playhead Behavior
 
 https://github.com/user-attachments/assets/3940cd0d-dd9d-4331-9172-592462ad65d3
 
-- [ ] Playhead moves in sync with the Ruler and Keyframe List during horizontal scrolling
-- [ ] Playhead maintains its relative position during horizontal scrolling
-- [ ] Playhead is visible only when within the Timeline's visible area, using the `hidden` attribute when completely out of view
+- [x] Playhead moves in sync with the Ruler and Keyframe List during horizontal scrolling
+- [x] Playhead maintains its relative position during horizontal scrolling
+- [x] Playhead is visible only when within the Timeline's visible area, using the `hidden` attribute when completely out of view
 
 ## Implementation Guidelines
 
@@ -102,7 +102,6 @@ https://github.com/user-attachments/assets/3940cd0d-dd9d-4331-9172-592462ad65d3
 ## Important Notes
 
 ⚠️ **Warning**: Do not change any `data-testid` attribute names in the provided components. These are used for automated assessment of your assignment. Modifying these names may result in failing the assessment criteria.
-
 
 ## Submission
 

@@ -1,10 +1,10 @@
-import { forwardRef, memo, useCallback } from "react";
-import { RenderTracker } from "./RenderTracker";
-import { useTime } from "./useTime";
+import { forwardRef, memo, useCallback, useEffect } from "react";
 import { validateNumber } from "./NumberInput";
-import { ScrollSyncElement } from "./useScroll";
-import { useThrottleFn } from "./useThrottleFn";
+import { RenderTracker } from "./RenderTracker";
+import { useDragging } from "./useDragging";
 import { useLatest } from "./useLatest";
+import { ScrollSyncElement } from "./useScroll";
+import { useTime } from "./useTime";
 
 export type RulerProps = ScrollSyncElement;
 
@@ -12,33 +12,30 @@ export const Ruler = forwardRef<HTMLDivElement, RulerProps>(
   ({ onScroll }, ref) => {
     const { setCurrentTime, currentTimeConfig, durationTime } = useTime();
     const currentTimeConfigLatest = useLatest(currentTimeConfig);
+    const { isDragging, startDragging, localCurrentPosition } = useDragging({
+      fps: 30,
+    });
 
-    const handleClick = useCallback<
-      NonNullable<React.DOMAttributes<HTMLDivElement>["onClick"]>
-    >((e) => {
-      const { left } = e.currentTarget.getBoundingClientRect();
-      const clickX = e.clientX - left;
-      const millisecond = validateNumber(
-        clickX,
-        currentTimeConfigLatest.current
-      );
-      setCurrentTime(millisecond.result);
-    }, []);
+    const startDragginfIfMouseLeft = useCallback<
+      React.MouseEventHandler<HTMLDivElement>
+    >(
+      (e) => {
+        if (e.button === 0) {
+          startDragging(e);
+        }
+      },
+      [startDragging]
+    );
 
-    const handleMouseMove = useCallback<
-      NonNullable<React.DOMAttributes<HTMLDivElement>["onMouseMove"]>
-    >((e) => {
-      if (e.buttons === 1) {
-        const { left } = e.currentTarget.getBoundingClientRect();
-        const mouseX = e.clientX - left;
+    useEffect(() => {
+      if (isDragging) {
         const millisecond = validateNumber(
-          mouseX,
+          localCurrentPosition.x,
           currentTimeConfigLatest.current
         );
         setCurrentTime(millisecond.result);
       }
-    }, []);
-    const [handleMouseMoveThrottled] = useThrottleFn(handleMouseMove, 32); // 30FPS
+    }, [isDragging, localCurrentPosition]);
 
     return (
       <>
@@ -57,8 +54,7 @@ export const Ruler = forwardRef<HTMLDivElement, RulerProps>(
             style={{
               width: `${durationTime}px`,
             }}
-            onClick={handleClick}
-            onMouseMove={handleMouseMoveThrottled}
+            onMouseDown={startDragginfIfMouseLeft}
           ></div>
         </div>
       </>
