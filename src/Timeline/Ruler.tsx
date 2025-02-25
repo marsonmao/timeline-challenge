@@ -1,4 +1,4 @@
-import { forwardRef, memo, useEffect } from "react";
+import { forwardRef, memo, useCallback, useEffect } from "react";
 import { validateNumber } from "./NumberInput";
 import { RenderTracker } from "./RenderTracker";
 import { useDragging } from "./useDragging";
@@ -15,6 +15,17 @@ export const Ruler = forwardRef<HTMLDivElement, RulerProps>(
     const { isDragging, startDragging, localCurrentPosition } = useDragging({
       fps: 30,
     });
+
+    const startDragginfIfMouseLeft = useCallback<
+      React.MouseEventHandler<HTMLDivElement>
+    >(
+      (e) => {
+        if (e.button === 0) {
+          startDragging(e);
+        }
+      },
+      [startDragging]
+    );
 
     useEffect(() => {
       if (isDragging) {
@@ -43,7 +54,7 @@ export const Ruler = forwardRef<HTMLDivElement, RulerProps>(
             style={{
               width: `${durationTime}px`,
             }}
-            onMouseDown={startDragging}
+            onMouseDown={startDragginfIfMouseLeft}
           ></div>
         </div>
       </>
