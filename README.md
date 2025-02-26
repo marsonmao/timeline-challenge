@@ -1,5 +1,27 @@
 # Phase Timeline Challenge
 
+## 📝 Notes to the review team 📝
+
+### Technical decisions
+
+1. **Project structure:** The files are flattened in `/src/Timeline` and `/e2e` because I'd like to keep it simple in this challenge. In a real world codebase we surely would manage them in dedicated folders like `/lib/hooks` etc.
+1. **Eslint:** I tried to setup a complete Eslint config file with recommended plugins, but it produced many errors and I did not have enough time to fix them all, so I left the codebase without a config file and rely on the default setup from react-scripts.
+1. **useInView:** In order to control the `hidden` attribute, I leveraged the familiar and popular library.
+1. **useLatest:** In order to optimize the dependency arrays of e.g. `useCallback`, I copied a single file from the tool set `react-use`. Some of these optimizations could be replaced by `useEvent` in React 19.
+1. **useDragging:** In order to provide better user experience when dragging, I added this hook to support a full screen dragging. This was created based on my former expereience in a similar complex music editor.
+1. **ChatGPT and Copilot:** I leveraged these AI tools for creating test cases and setting up PlayWright. Everything is reviewed, of course.
+1. **Workarounds for tests:** There are two workarounds in `test-util` because it seems that those behaviors are not correctly simulated in jsdom.
+1. **DOM structure change in Playhead:** I added extra elements in this component because I'd like to leverage the native scrolling behavior to sync its position with Ruler. I'm not sure if the expected implementation is to control the transform of `playhead`. I left the test id unchanged and I hope my DOM structure would not fail the automated assesment.
+1. **Regarding a requirement:** "Invalid inputs (non-numeric) revert to the previous valid value". Although it says "previous" value, after viewing the demo video multiple times, I feel it actually refers to the mimimum allowed value. This also simplifies the implementation since I don't need an extra state, so I decided to make it this way. Please let me know if we indeed want it to revert to the previous valid value.
+
+### Commands
+
+1. `yarn start` run the app in http://localhost:3000/
+1. `yarn test /src` run all test cases and display the coverage report
+1. `yarn test:e2e` run all e2e test cases; if you haven't installed it before, you might need `yarn playwright install --with-deps`; read here for more details https://playwright.dev/docs/intro#updating-playwright
+
+**Happy to attend the challange! 😃** 2025/02/26
+
 ## Overview
 
 Implement interactive features for a Timeline component. We will provide a basic Timeline component scaffold, and your task is to implement the functionality that meets the user behavior requirements outlined below.
