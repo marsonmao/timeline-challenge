@@ -464,6 +464,49 @@ describe("NumberInput requirements", () => {
       expect(input).not.toHaveAttribute("data-invalid");
     });
 
+    test("If an invalid number is corrected by spinner or arrow key, the invalid status should be removed", async () => {
+      const { getByRole } = render(
+        <NumberProvider initialValue={10}>
+          <NumberInputWrapper
+            validator={validatorSpy}
+            config={{
+              step: 10,
+              min: 0,
+              max: 300,
+            }}
+          />
+        </NumberProvider>
+      );
+      const input = getByRole("spinbutton") as HTMLInputElement;
+      expect(input.value).toBe("10");
+
+      async function initTheInput() {
+        await clickAndType(input, "123");
+        expect(input.value).toBe("123");
+        expect(input).toHaveAttribute("data-invalid");
+      }
+
+      await initTheInput();
+      clickSpinner(input, "increment", 123, 10);
+      expect(input.value).toBe("130");
+      expect(input).not.toHaveAttribute("data-invalid");
+
+      await initTheInput();
+      clickSpinner(input, "decrement", 123, 10);
+      expect(input.value).toBe("120");
+      expect(input).not.toHaveAttribute("data-invalid");
+
+      await initTheInput();
+      pressArrowKey(input, "ArrowUp", 123, 10);
+      expect(input.value).toBe("130");
+      expect(input).not.toHaveAttribute("data-invalid");
+
+      await initTheInput();
+      pressArrowKey(input, "ArrowDown", 123, 10);
+      expect(input.value).toBe("120");
+      expect(input).not.toHaveAttribute("data-invalid");
+    });
+
     test("If config changes, the validation result should reflect it accordingly", async () => {
       const config1 = {
         step: 1,
