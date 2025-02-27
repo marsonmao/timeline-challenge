@@ -72,14 +72,14 @@ export function NumberInput({
   const configLatest = useLatest(config);
   const onChangeLatest = useLatest(onChange);
 
-  const handleValueChange = useCallback((localValue: string) => {
-    const rawValue = parseFloat(localValue);
+  const confirmLocalValue = useCallback((localValue: string) => {
     const { result: validatedValue } = validator(
-      rawValue,
+      parseFloat(localValue),
       configLatest.current
     );
-    onChangeLatest.current(validatedValue);
     setLocalValue(validatedValue.toString());
+    setHasError(false);
+    onChangeLatest.current(validatedValue);
   }, []);
 
   const selectInputText = useCallback(() => {
@@ -89,7 +89,7 @@ export function NumberInput({
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (isSpinnerClicked.current || isArrowKeyDown.current) {
-        handleValueChange(e.target.value);
+        confirmLocalValue(e.target.value);
         selectInputText();
       } else if (e.target.value === "") {
         // Empty target value means the current input is not a valid number
@@ -105,7 +105,7 @@ export function NumberInput({
         setHasError(hasError);
       }
     },
-    [selectInputText, handleValueChange]
+    [selectInputText, confirmLocalValue]
   );
 
   const handleFocus = useCallback(() => {
@@ -118,7 +118,7 @@ export function NumberInput({
     if (blurTriggerKey.current === "Escape") {
       setLocalValue(valueString);
     } else {
-      handleValueChange(localValue);
+      confirmLocalValue(localValue);
     }
 
     setIsEditing(false);

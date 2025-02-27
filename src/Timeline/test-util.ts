@@ -13,6 +13,22 @@ export const clickAndType = async (input: HTMLInputElement, value: string) => {
   });
 };
 
+function roundToNearestMultipleOfStep(
+  direction: "up" | "down",
+  currentValue: number,
+  step: number
+) {
+  let value = currentValue;
+  if (direction === "up") {
+    value = (Math.floor(currentValue / step) + 1) * step;
+  } else {
+    value =
+      Math.floor(currentValue / step) * step -
+      (currentValue % step === 0 ? step : 0);
+  }
+  return value;
+}
+
 // WORKAROUND: the correct behavior is not simulated by JSDOM
 export function pressArrowKey(
   input: HTMLElement,
@@ -20,9 +36,14 @@ export function pressArrowKey(
   currentValue: number,
   step: number
 ) {
-  const value = key === "ArrowUp" ? currentValue + step : currentValue - step;
+  const value = roundToNearestMultipleOfStep(
+    key === "ArrowUp" ? "up" : "down",
+    currentValue,
+    step
+  );
   fireEvent.keyDown(input, { key });
   fireEvent.change(input, { target: { value } });
+  fireEvent.keyUp(input, { key });
 }
 
 // WORKAROUND: the correct behavior is not simulated by JSDOM
@@ -32,8 +53,12 @@ export function clickSpinner(
   currentValue: number,
   step: number
 ) {
-  const value =
-    button === "increment" ? currentValue + step : currentValue - step;
+  const value = roundToNearestMultipleOfStep(
+    button === "increment" ? "up" : "down",
+    currentValue,
+    step
+  );
   fireEvent.mouseDown(spinner, { button: 0 });
   fireEvent.change(spinner, { target: { value } });
+  fireEvent.mouseUp(spinner, { button: 0 });
 }
