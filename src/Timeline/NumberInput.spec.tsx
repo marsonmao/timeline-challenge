@@ -392,6 +392,28 @@ describe("NumberInput requirements", () => {
       expect(input).not.toHaveAttribute("data-invalid");
     });
 
+    test("Clearing the input completely would reset to the minimum allowed value", async () => {
+      const { getByRole } = render(
+        <NumberProvider initialValue={50}>
+          <NumberInputWrapper
+            validator={validatorSpy}
+            config={config}
+            onChange={onChangeSpy}
+          />
+        </NumberProvider>
+      );
+      const input = getByRole("spinbutton") as HTMLInputElement;
+
+      await userEvent.click(input);
+      await userEvent.clear(input);
+      expect(input.value).toBe("0");
+      expect(input).not.toHaveAttribute("data-invalid");
+
+      await userEvent.tab();
+      expect(input.value).toBe("0");
+      expect(input).not.toHaveAttribute("data-invalid");
+    });
+
     test("Decimal values are automatically rounded to the nearest integer", async () => {
       const { getByRole } = render(
         <NumberProvider initialValue={10}>
@@ -507,7 +529,7 @@ describe("NumberInput requirements", () => {
       expect(input).not.toHaveAttribute("data-invalid");
     });
 
-    test("If config changes, the validation result should reflect it accordingly", async () => {
+    test("If config.max changes, the validation result should reflect it accordingly", async () => {
       const config1 = {
         step: 1,
         min: 0,
@@ -525,9 +547,7 @@ describe("NumberInput requirements", () => {
       );
       const input = getByRole("spinbutton") as HTMLInputElement;
 
-      await userEvent.click(input);
-      await userEvent.clear(input);
-      await userEvent.type(input, "300");
+      await clickAndType(input, "300");
       await userEvent.keyboard("{Enter}");
       expect(input.value).toBe("300");
 
@@ -543,6 +563,41 @@ describe("NumberInput requirements", () => {
       await userEvent.keyboard("{Enter}");
       expect(input.value).toBe("100");
     });
+  });
+
+  test("If config.min changes, the validation result should reflect it accordingly", async () => {
+    const config1 = {
+      step: 1,
+      min: 0,
+      max: 300,
+    };
+    const config2 = {
+      step: 1,
+      min: 100,
+      max: 300,
+    };
+    const { getByRole, rerender } = render(
+      <NumberProvider initialValue={10}>
+        <NumberInputWrapper validator={validatorSpy} config={config1} />
+      </NumberProvider>
+    );
+    const input = getByRole("spinbutton") as HTMLInputElement;
+
+    await clickAndType(input, "40");
+    await userEvent.keyboard("{Enter}");
+    expect(input.value).toBe("40");
+
+    rerender(
+      <NumberProvider initialValue={10}>
+        <NumberInputWrapper validator={validatorSpy} config={config2} />
+      </NumberProvider>
+    );
+
+    await userEvent.click(input);
+    expect(input.value).toBe("40");
+
+    await userEvent.keyboard("{Enter}");
+    expect(input.value).toBe("100");
   });
 
   describe("validateNumber edge cases", () => {
