@@ -59,7 +59,7 @@ describe("Timeline component behavior", () => {
     });
   });
 
-  describe("Interactive updates", () => {
+  describe("Components interactions", () => {
     test("Playhead position updates only after current time input is committed", async () => {
       const { getByTestId } = render(<Timeline />);
       const currentTimeInput = getByTestId(
