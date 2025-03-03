@@ -7,9 +7,13 @@ const currentTimeConfig = { step: 10, min: 0, max: 600 };
 const durationTime = 600;
 
 jest.mock("./useTime", () => ({
-  useTime: () => ({
+  useCurrentTime: () => ({
     setCurrentTime: mockSetCurrentTime,
+  }),
+  useCurrentTimeConfig: () => ({
     currentTimeConfig,
+  }),
+  useDurationTime: () => ({
     durationTime,
   }),
 }));
