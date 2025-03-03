@@ -1,43 +1,35 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { KeyframeListMemoed as KeyframeList } from "./KeyframeList";
 import { PlayControlsMemoed as PlayControls } from "./PlayControls";
 import { PlayheadMemoed as Playhead } from "./Playhead";
 import { RulerMemoed as Ruler } from "./Ruler";
-import { TimeConfig, TimeContext } from "./TimeContext";
+import { Provider } from "jotai";
 import { TrackListMemoed as TrackList } from "./TrackList";
 import { useScroll } from "./useScroll";
+import { useTimeStore } from "./useTime";
 
 export const Timeline = () => {
   /**
-   * Time context
+   * Time store
    */
-  const durationTimeConfig: TimeConfig = {
-    /**
-     * In unit of Milliseconds
-     */
-    step: 10,
-    min: 100,
-    max: 6000,
-  };
-  const [currentTimeConfig, setCurrentTimeConfig] = useState<TimeConfig>({
-    /**
-     * In unit of Milliseconds
-     */
-    step: 10,
-    min: 0,
-    max: 6000,
+  const timeStore = useTimeStore({
+    initialDurationTimeConfig: {
+      /**
+       * In unit of Milliseconds
+       */
+      step: 10,
+      min: 100,
+      max: 6000,
+    },
+    initialCurrentTimeConfig: {
+      /**
+       * In unit of Milliseconds
+       */
+      step: 10,
+      min: 0,
+      max: 6000,
+    },
   });
-  const [currentTime, setCurrentTime] = useState(currentTimeConfig.min);
-  const [durationTime, setDurationTime] = useState(durationTimeConfig.max);
-  const timeContextValue = {
-    currentTime,
-    setCurrentTime,
-    currentTimeConfig,
-    setCurrentTimeConfig,
-    durationTime,
-    setDurationTime,
-    durationTimeConfig,
-  };
 
   /**
    * Scroll behavior
@@ -68,13 +60,13 @@ export const Timeline = () => {
       "
       data-testid="timeline"
     >
-      <TimeContext.Provider value={timeContextValue}>
+      <Provider store={timeStore}>
         <PlayControls />
         <Ruler ref={rulerRef} onScroll={syncScrollX} />
         <TrackList ref={trackListRef} onScroll={syncScrollY} />
         <KeyframeList ref={keyframeListRef} onScroll={syncBothScroll} />
         <Playhead ref={playheadRef} />
-      </TimeContext.Provider>
+      </Provider>
     </div>
   );
 };

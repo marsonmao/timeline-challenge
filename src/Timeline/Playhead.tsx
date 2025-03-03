@@ -1,10 +1,13 @@
-import { forwardRef, memo, useContext } from "react";
+import { forwardRef, memo } from "react";
 import { useInView } from "react-intersection-observer";
 import { RenderTracker } from "./RenderTracker";
-import { TimeContext } from "./TimeContext";
+
+import { useCurrentTime, useDurationTime } from "./useTime";
 
 export const Playhead = forwardRef<HTMLDivElement>((_props, ref) => {
-  const { currentTime, durationTime } = useContext(TimeContext);
+  const { currentTime } = useCurrentTime();
+  const { durationTime } = useDurationTime();
+
   const { ref: inViewRef, inView } = useInView({
     threshold: 0,
   });

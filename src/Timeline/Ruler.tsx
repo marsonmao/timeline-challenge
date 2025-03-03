@@ -4,13 +4,20 @@ import { RenderTracker } from "./RenderTracker";
 import { useDragging } from "./useDragging";
 import { useLatest } from "./useLatest";
 import { ScrollSyncElement } from "./useScroll";
-import { useTime } from "./useTime";
+import {
+  useCurrentTime,
+  useCurrentTimeConfig,
+  useDurationTime,
+} from "./useTime";
 
 export type RulerProps = ScrollSyncElement;
 
 export const Ruler = forwardRef<HTMLDivElement, RulerProps>(
   ({ onScroll }, ref) => {
-    const { setCurrentTime, currentTimeConfig, durationTime } = useTime();
+    const { setCurrentTime } = useCurrentTime(); // TODO could optimize
+    const { currentTimeConfig } = useCurrentTimeConfig();
+    const { durationTime } = useDurationTime();
+
     const currentTimeConfigLatest = useLatest(currentTimeConfig);
     const { isDragging, startDragging, localCurrentPosition } = useDragging({
       fps: 30,

@@ -1,17 +1,18 @@
 import { memo } from "react";
 import { NumberInput, validateNumber } from "./NumberInput";
 import { RenderTracker } from "./RenderTracker";
-import { useTime } from "./useTime";
+import {
+  useCurrentTime,
+  useCurrentTimeConfig,
+  useDurationTime,
+  useDurationTimeConfig,
+} from "./useTime";
 
 export const PlayControls = () => {
-  const {
-    currentTime,
-    setCurrentTime,
-    currentTimeConfig,
-    durationTime,
-    setDurationTime,
-    durationTimeConfig,
-  } = useTime();
+  const { currentTime, setCurrentTime } = useCurrentTime();
+  const { currentTimeConfig } = useCurrentTimeConfig();
+  const { durationTime, setDurationTime } = useDurationTime();
+  const { durationTimeConfig } = useDurationTimeConfig();
 
   return (
     <>
