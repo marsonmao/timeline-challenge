@@ -13,7 +13,7 @@
 1. **Workarounds for tests:** There are two workarounds in `test-util` because it seems that those behaviors are not correctly simulated in jsdom.
 1. **DOM structure change in Playhead:** I added extra elements in this component because I'd like to leverage the native scrolling behavior to sync its position with Ruler. I'm not sure if the expected implementation is to control the transform of `playhead`. I left the test id unchanged and I hope my DOM structure would not fail the automated assesment.
 1. **Regarding a requirement:** "Invalid inputs (non-numeric) revert to the previous valid value". Although it says "previous" value, after viewing the demo video multiple times, I feel it actually refers to the mimimum allowed value. This also simplifies the implementation since I don't need an extra state, so I decided to make it this way. Please let me know if we indeed want it to revert to the previous valid value.
-1. **React context**: in this challenge, initially I tried to avoid using external libraries so I started with React context for managing global states. However, regarding the fact that I still added some dependencies, maybe I should also replace it with one of the popular state management libraries to achieve a better render performance. Afterall, in the real world case, we definitely use one.
+1. **Jotai**: I compare it with Zustand but eventually chose it. The reason is that Jotai seems to aim for render-performance-first in the first place. The concept of atom provides great granularity so we should be able to naturally manage the global state in an organized way withour worrying about over fetching.
 
 ### Commands
 
