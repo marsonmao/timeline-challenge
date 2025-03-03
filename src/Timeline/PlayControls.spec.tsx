@@ -1,9 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { PropsWithChildren, useState } from "react";
+import { Provider } from "jotai";
+import { PropsWithChildren } from "react";
 import { PlayControls } from "./PlayControls";
-import { TimeContext } from "./TimeContext";
 import { clickAndType } from "./test-util";
+import { useTimeStore } from "./useTime";
 
 describe("PlayControls requirements", () => {
   const TimelineProvider = ({
@@ -14,25 +15,15 @@ describe("PlayControls requirements", () => {
     initialCurrentTime: number;
     initialDurationTime: number;
   }>) => {
-    const [currentTime, setCurrentTime] = useState(initialCurrentTime);
-    const [durationTime, setDurationTime] = useState(initialDurationTime);
     const currentTimeConfig = { step: 10, min: 0, max: 6000 };
     const durationTimeConfig = { step: 10, min: 100, max: 6000 };
-    return (
-      <TimeContext.Provider
-        value={{
-          currentTime,
-          setCurrentTime,
-          currentTimeConfig,
-          setCurrentTimeConfig: () => {},
-          durationTime,
-          setDurationTime,
-          durationTimeConfig,
-        }}
-      >
-        {children}
-      </TimeContext.Provider>
-    );
+    const timeStore = useTimeStore({
+      initialDurationTimeConfig: durationTimeConfig,
+      initialCurrentTimeConfig: currentTimeConfig,
+      initialDurationTime,
+      initialCurrentTime,
+    });
+    return <Provider store={timeStore}>{children}</Provider>;
   };
 
   test("Current Time is always between 0ms and the Duration", async () => {
