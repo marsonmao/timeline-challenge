@@ -37,15 +37,25 @@ const durationTimeAtomExpanded = atom(
 export const useTimeStore = ({
   initialDurationTimeConfig,
   initialCurrentTimeConfig,
+  initialDurationTime,
+  initialCurrentTime,
 }: {
   initialDurationTimeConfig: TimeConfig;
   initialCurrentTimeConfig: TimeConfig;
+  initialDurationTime?: number;
+  initialCurrentTime?: number;
 }) => {
   const [timeStore] = useState(() => {
     const store = createStore();
-    store.set(durationTimeAtom, initialDurationTimeConfig.max);
+    store.set(
+      durationTimeAtom,
+      initialDurationTime ?? initialDurationTimeConfig.max
+    );
     store.set(durationTimeConfigAtom, initialDurationTimeConfig);
-    store.set(currentTimeAtom, initialCurrentTimeConfig.min);
+    store.set(
+      currentTimeAtom,
+      initialCurrentTime ?? initialCurrentTimeConfig.min
+    );
     store.set(currentTimeConfigAtom, initialCurrentTimeConfig);
     return store;
   });
