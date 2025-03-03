@@ -1,38 +1,89 @@
-import { useCallback, useContext } from "react";
-import { TimeContext } from "./TimeContext";
-import { useLatest } from "./useLatest";
+import { atom, createStore, useAtom } from "jotai";
+import { useState } from "react";
 
-export const useTime = () => {
-  const {
-    currentTime,
-    setCurrentTime,
-    currentTimeConfig,
-    setCurrentTimeConfig,
-    durationTime,
-    setDurationTime,
-    durationTimeConfig,
-  } = useContext(TimeContext);
+export type TimeConfig = {
+  step: number;
+  min: number;
+  max: number;
+};
 
-  const currentTimeLatest = useLatest(currentTime);
-  const currentTimeConfigLatest = useLatest(currentTimeConfig);
-  const setDurationTimeAndCapCurrentTime = useCallback(
-    (durationTimeValue: number) => {
-      setDurationTime(durationTimeValue);
-      setCurrentTime(Math.min(currentTimeLatest.current, durationTimeValue));
-      setCurrentTimeConfig({
-        ...currentTimeConfigLatest.current,
-        max: durationTimeValue,
-      });
-    },
-    []
-  );
+const currentTimeAtom = atom(0);
+const currentTimeConfigAtom = atom<TimeConfig>({
+  step: 1,
+  min: 0,
+  max: 100,
+});
+const durationTimeAtom = atom(0);
+const durationTimeConfigAtom = atom<TimeConfig>({
+  step: 1,
+  min: 0,
+  max: 100,
+});
+const durationTimeAtomExpanded = atom(
+  (get) => get(durationTimeAtom),
+  (get, set, newDurationTime: number) => {
+    set(durationTimeAtom, newDurationTime);
+    set(currentTimeAtom, Math.min(get(currentTimeAtom), newDurationTime));
+    set(currentTimeConfigAtom, {
+      ...get(currentTimeConfigAtom),
+      max: newDurationTime,
+    });
+  }
+);
 
+/**
+ * This should only be used once inthe root of the component tree
+ */
+export const useTimeStore = ({
+  initialDurationTimeConfig,
+  initialCurrentTimeConfig,
+}: {
+  initialDurationTimeConfig: TimeConfig;
+  initialCurrentTimeConfig: TimeConfig;
+}) => {
+  const [timeStore] = useState(() => {
+    const store = createStore();
+    store.set(durationTimeAtom, initialDurationTimeConfig.max);
+    store.set(durationTimeConfigAtom, initialDurationTimeConfig);
+    store.set(currentTimeAtom, initialCurrentTimeConfig.min);
+    store.set(currentTimeConfigAtom, initialCurrentTimeConfig);
+    return store;
+  });
+  return timeStore;
+};
+
+export const useCurrentTime = () => {
+  const [currentTime, setCurrentTime] = useAtom(currentTimeAtom);
   return {
     currentTime,
     setCurrentTime,
-    currentTimeConfig,
+  };
+};
+
+export const useDurationTime = () => {
+  const [durationTime, setDurationTime] = useAtom(durationTimeAtomExpanded);
+  return {
     durationTime,
-    setDurationTime: setDurationTimeAndCapCurrentTime,
+    setDurationTime,
+  };
+};
+
+export const useCurrentTimeConfig = () => {
+  const [currentTimeConfig, setCurrentTimeConfig] = useAtom(
+    currentTimeConfigAtom
+  );
+  return {
+    currentTimeConfig,
+    setCurrentTimeConfig,
+  };
+};
+
+export const useDurationTimeConfig = () => {
+  const [durationTimeConfig, setDurationTimeConfig] = useAtom(
+    durationTimeConfigAtom
+  );
+  return {
     durationTimeConfig,
+    setDurationTimeConfig,
   };
 };

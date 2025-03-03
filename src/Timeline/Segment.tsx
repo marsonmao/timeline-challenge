@@ -1,7 +1,7 @@
-import { useTime } from "./useTime";
+import { useDurationTime } from "./useTime";
 
 export const Segment = () => {
-  const { durationTime } = useTime();
+  const { durationTime } = useDurationTime();
 
   return (
     <div
