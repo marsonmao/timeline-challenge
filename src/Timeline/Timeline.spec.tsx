@@ -35,6 +35,26 @@ describe("Timeline component behavior", () => {
       expect(trackListRenderTracker.textContent).toBe("1");
       expect(keyframeListRenderTracker.textContent).toBe("1");
     });
+
+    test("When adjusting current time, all the Segments should not need to rerender", async () => {
+      const { getByTestId, getAllByTestId } = render(<Timeline />);
+      const currentTimeInput = getByTestId(
+        "current-time-input"
+      ) as HTMLInputElement;
+      const segmentRenderTrackers = getAllByTestId("segment-render-tracker");
+
+      await clickAndType(currentTimeInput, "20");
+      await userEvent.keyboard("{Enter}");
+      segmentRenderTrackers.forEach((t) => {
+        expect(t.textContent).toBe("1");
+      });
+
+      await clickAndType(currentTimeInput, "30");
+      await userEvent.keyboard("{Enter}");
+      segmentRenderTrackers.forEach((t) => {
+        expect(t.textContent).toBe("1");
+      });
+    });
   });
 
   describe("Scroll sync", () => {
