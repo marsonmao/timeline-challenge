@@ -32,4 +32,6 @@ export const KeyframeList = forwardRef<HTMLDivElement, KeyframeListProps>(
   }
 );
 
+KeyframeList.displayName = "KeyframeList";
+
 export const KeyframeListMemoed = memo(KeyframeList);

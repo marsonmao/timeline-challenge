@@ -42,7 +42,12 @@ export const Ruler = forwardRef<HTMLDivElement, RulerProps>(
         );
         setCurrentTime(millisecond.result);
       }
-    }, [isDragging, localCurrentPosition]);
+    }, [
+      isDragging,
+      localCurrentPosition,
+      currentTimeConfigLatest,
+      setCurrentTime,
+    ]);
 
     return (
       <>
@@ -68,5 +73,7 @@ export const Ruler = forwardRef<HTMLDivElement, RulerProps>(
     );
   }
 );
+
+Ruler.displayName = "Playhead";
 
 export const RulerMemoed = memo(Ruler);

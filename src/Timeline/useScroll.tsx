@@ -38,22 +38,28 @@ export const useScroll = ({
 
   const syncScrollX = useCallback<
     NonNullable<React.DOMAttributes<HTMLElement>["onScroll"]>
-  >((e) => {
-    syncElementScrollPosition(
-      e.currentTarget,
-      scrollXElementsLatest.current,
-      "scrollLeft"
-    );
-  }, []);
+  >(
+    (e) => {
+      syncElementScrollPosition(
+        e.currentTarget,
+        scrollXElementsLatest.current,
+        "scrollLeft"
+      );
+    },
+    [scrollXElementsLatest]
+  );
   const syncScrollY = useCallback<
     NonNullable<React.DOMAttributes<HTMLElement>["onScroll"]>
-  >((e) => {
-    syncElementScrollPosition(
-      e.currentTarget,
-      scrollYElementsLatest.current,
-      "scrollTop"
-    );
-  }, []);
+  >(
+    (e) => {
+      syncElementScrollPosition(
+        e.currentTarget,
+        scrollYElementsLatest.current,
+        "scrollTop"
+      );
+    },
+    [scrollYElementsLatest]
+  );
   const syncBothScroll = useCallback<typeof syncScrollX>(
     (e) => {
       syncScrollX(e);
