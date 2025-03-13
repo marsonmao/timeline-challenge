@@ -5,7 +5,7 @@
 ### Technical decisions
 
 1. **Project structure:** The files are flattened in `/src/Timeline` and `/e2e` because I'd like to keep it simple in this challenge. In a real world codebase we surely would manage them in dedicated folders like `/lib/hooks` etc.
-1. **Eslint:** I tried to setup a complete Eslint config file with recommended plugins, but it produced many errors and I did not have enough time to fix them all, so I left the codebase without a config file and rely on the default setup from react-scripts.
+1. **Eslint:** to keep it simple, the config was made to be compatible with the version used by `react-script` which is `8.57.0`. The same dependency is also explicitly added in `package.json`.
 1. **useInView:** In order to control the `hidden` attribute, I leveraged the familiar and popular library.
 1. **useLatest:** In order to optimize the dependency arrays of e.g. `useCallback`, I copied a single file from the tool set `react-use`. Some of these optimizations could be replaced by `useEvent` in React 19.
 1. **useDragging:** In order to provide better user experience when dragging, I added this hook to support a full screen dragging. This was created based on my former expereience in a similar complex music editor.
