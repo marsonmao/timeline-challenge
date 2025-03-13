@@ -10,7 +10,8 @@ describe("RenderTracker", () => {
 
   test("renders the render count when NODE_ENV is 'test'", () => {
     process.env.NODE_ENV = "test";
-    const {rerender} = render(<RenderTracker dataTestId="tracker" />);
+    const { rerender } = render(<RenderTracker dataTestId="tracker" />);
+
     const tracker = screen.getByTestId("tracker");
     expect(tracker).toHaveTextContent("1");
 
@@ -20,8 +21,9 @@ describe("RenderTracker", () => {
 
   test("returns null when NODE_ENV is not 'test'", () => {
     process.env.NODE_ENV = "production";
-    const { container } = render(<RenderTracker dataTestId="tracker" />);
-    
-    expect(container.firstChild).toBeNull();
+    render(<RenderTracker dataTestId="tracker" />);
+
+    const tracker = screen.queryByTestId("tracker");
+    expect(tracker).toBeNull();
   });
 });

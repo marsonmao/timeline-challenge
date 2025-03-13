@@ -1,4 +1,4 @@
-import { fireEvent, render } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { useRef } from "react";
 import { useScroll } from "./useScroll";
 
@@ -70,9 +70,9 @@ describe("useScroll behavior", () => {
   } as DOMRect;
 
   test("syncScrollX: horizontal scroll sync", () => {
-    const { getByTestId } = render(<DummyScrollSync mode="x" />);
-    const div1 = getByTestId("div1") as HTMLDivElement;
-    const div2 = getByTestId("div2") as HTMLDivElement;
+    render(<DummyScrollSync mode="x" />);
+    const div1 = screen.getByTestId("div1") as HTMLDivElement;
+    const div2 = screen.getByTestId("div2") as HTMLDivElement;
     jest.spyOn(div1, "getBoundingClientRect").mockReturnValue(fakeBoundingRect);
     jest.spyOn(div2, "getBoundingClientRect").mockReturnValue(fakeBoundingRect);
 
@@ -82,9 +82,9 @@ describe("useScroll behavior", () => {
   });
 
   test("syncScrollY: vertical scroll sync", () => {
-    const { getByTestId } = render(<DummyScrollSync mode="y" />);
-    const div1 = getByTestId("div1") as HTMLDivElement;
-    const div2 = getByTestId("div2") as HTMLDivElement;
+    render(<DummyScrollSync mode="y" />);
+    const div1 = screen.getByTestId("div1") as HTMLDivElement;
+    const div2 = screen.getByTestId("div2") as HTMLDivElement;
     jest.spyOn(div1, "getBoundingClientRect").mockReturnValue(fakeBoundingRect);
     jest.spyOn(div2, "getBoundingClientRect").mockReturnValue(fakeBoundingRect);
 
@@ -94,9 +94,9 @@ describe("useScroll behavior", () => {
   });
 
   test("syncBothScroll: syncs both horizontal and vertical scroll positions", () => {
-    const { getByTestId } = render(<DummyScrollSync mode="both" />);
-    const div1 = getByTestId("div1") as HTMLDivElement;
-    const div2 = getByTestId("div2") as HTMLDivElement;
+    render(<DummyScrollSync mode="both" />);
+    const div1 = screen.getByTestId("div1") as HTMLDivElement;
+    const div2 = screen.getByTestId("div2") as HTMLDivElement;
     jest.spyOn(div1, "getBoundingClientRect").mockReturnValue(fakeBoundingRect);
     jest.spyOn(div2, "getBoundingClientRect").mockReturnValue(fakeBoundingRect);
 

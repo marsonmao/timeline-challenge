@@ -1,4 +1,4 @@
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Timeline } from "./Timeline";
 import { clickAndType, clickSpinner, pressArrowKey } from "./test-util";
@@ -6,17 +6,21 @@ import { clickAndType, clickSpinner, pressArrowKey } from "./test-util";
 describe("Timeline component behavior", () => {
   describe("Ensure optimized render performance", () => {
     test("the components subscribed to the time state render accordingly", async () => {
-      const { getByTestId } = render(<Timeline />);
-      const currentTimeInput = getByTestId(
+      render(<Timeline />);
+      const currentTimeInput = screen.getByTestId(
         "current-time-input"
       ) as HTMLInputElement;
-      const playControlsRenderTracker = getByTestId(
+      const playControlsRenderTracker = screen.getByTestId(
         "play-controls-render-tracker"
       );
-      const playheadRenderTracker = getByTestId("playhead-render-tracker");
-      const rulerRenderTracker = getByTestId("ruler-render-tracker");
-      const trackListRenderTracker = getByTestId("track-list-render-tracker");
-      const keyframeListRenderTracker = getByTestId(
+      const playheadRenderTracker = screen.getByTestId(
+        "playhead-render-tracker"
+      );
+      const rulerRenderTracker = screen.getByTestId("ruler-render-tracker");
+      const trackListRenderTracker = screen.getByTestId(
+        "track-list-render-tracker"
+      );
+      const keyframeListRenderTracker = screen.getByTestId(
         "keyframe-list-render-tracker"
       );
 
@@ -37,11 +41,13 @@ describe("Timeline component behavior", () => {
     });
 
     test("When adjusting current time, all the Segments should not need to rerender", async () => {
-      const { getByTestId, getAllByTestId } = render(<Timeline />);
-      const currentTimeInput = getByTestId(
+      render(<Timeline />);
+      const currentTimeInput = screen.getByTestId(
         "current-time-input"
       ) as HTMLInputElement;
-      const segmentRenderTrackers = getAllByTestId("segment-render-tracker");
+      const segmentRenderTrackers = screen.getAllByTestId(
+        "segment-render-tracker"
+      );
 
       await clickAndType(currentTimeInput, "20");
       await userEvent.keyboard("{Enter}");
@@ -59,10 +65,10 @@ describe("Timeline component behavior", () => {
 
   describe("Scroll sync", () => {
     test("syncs horizontal scroll positions across Ruler, KeyframeList, and Playhead", () => {
-      const { getByTestId } = render(<Timeline />);
-      const ruler = getByTestId("ruler") as HTMLElement;
-      const keyframeList = getByTestId("keyframe-list") as HTMLElement;
-      const playheadRoot = getByTestId("playhead-root") as HTMLElement;
+      render(<Timeline />);
+      const ruler = screen.getByTestId("ruler") as HTMLElement;
+      const keyframeList = screen.getByTestId("keyframe-list") as HTMLElement;
+      const playheadRoot = screen.getByTestId("playhead-root") as HTMLElement;
 
       ruler.scrollLeft = 100;
       fireEvent.scroll(ruler);
@@ -71,9 +77,9 @@ describe("Timeline component behavior", () => {
     });
 
     test("syncs vertical scroll positions between KeyframeList and TrackList", () => {
-      const { getByTestId } = render(<Timeline />);
-      const keyframeList = getByTestId("keyframe-list") as HTMLElement;
-      const trackList = getByTestId("track-list") as HTMLElement;
+      render(<Timeline />);
+      const keyframeList = screen.getByTestId("keyframe-list") as HTMLElement;
+      const trackList = screen.getByTestId("track-list") as HTMLElement;
 
       keyframeList.scrollTop = 50;
       fireEvent.scroll(keyframeList);
@@ -83,11 +89,11 @@ describe("Timeline component behavior", () => {
 
   describe("Components interactions", () => {
     test("Playhead position updates only after current time input is committed", async () => {
-      const { getByTestId } = render(<Timeline />);
-      const currentTimeInput = getByTestId(
+      render(<Timeline />);
+      const currentTimeInput = screen.getByTestId(
         "current-time-input"
       ) as HTMLInputElement;
-      const playhead = getByTestId("playhead") as HTMLElement;
+      const playhead = screen.getByTestId("playhead") as HTMLElement;
 
       await clickAndType(currentTimeInput, "100");
       await userEvent.tab();
@@ -106,16 +112,18 @@ describe("Timeline component behavior", () => {
     });
 
     test("Ruler length visually represents the total Duration", () => {
-      const { getByTestId } = render(<Timeline />);
-      const rulerBar = getByTestId("ruler-bar") as HTMLElement;
+      render(<Timeline />);
+      const rulerBar = screen.getByTestId("ruler-bar") as HTMLElement;
 
       expect(rulerBar.style.width).toBe("6000px");
     });
 
     test("Ruler updates its length only after Duration input is committed", async () => {
-      const { getByTestId } = render(<Timeline />);
-      const durationInput = getByTestId("duration-input") as HTMLInputElement;
-      const rulerBar = getByTestId("ruler-bar") as HTMLElement;
+      render(<Timeline />);
+      const durationInput = screen.getByTestId(
+        "duration-input"
+      ) as HTMLInputElement;
+      const rulerBar = screen.getByTestId("ruler-bar") as HTMLElement;
 
       expect(rulerBar.style.width).toBe("6000px");
 
@@ -136,18 +144,20 @@ describe("Timeline component behavior", () => {
     });
 
     test("Segment (KeyframeList) length visually represents the total Duration", async () => {
-      const { findAllByTestId } = render(<Timeline />);
-      const allSegments = await findAllByTestId("segment");
+      render(<Timeline />);
+      const allSegments = await screen.findAllByTestId("segment");
       const firstSegment = allSegments[0] as HTMLElement;
 
       expect(firstSegment.style.width).toBe("6000px");
     });
 
     test("Segment updates its length only after Duration input is committed", async () => {
-      const { getByTestId, findAllByTestId } = render(<Timeline />);
-      const allSegments = await findAllByTestId("segment");
+      render(<Timeline />);
+      const allSegments = await screen.findAllByTestId("segment");
       const firstSegment = allSegments[0] as HTMLElement;
-      const durationInput = getByTestId("duration-input") as HTMLInputElement;
+      const durationInput = screen.getByTestId(
+        "duration-input"
+      ) as HTMLInputElement;
 
       expect(firstSegment.style.width).toBe("6000px");
 
