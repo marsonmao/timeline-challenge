@@ -3,9 +3,7 @@
  */
 import { useRef } from "react";
 
-export const useLatest = <T extends unknown>(
-  value: T
-): { readonly current: T } => {
+export const useLatest = <T,>(value: T): { readonly current: T } => {
   const ref = useRef(value);
   ref.current = value;
   return ref;

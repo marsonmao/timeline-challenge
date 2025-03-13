@@ -49,4 +49,6 @@ export const Playhead = forwardRef<HTMLDivElement>((_props, ref) => {
   );
 });
 
+Playhead.displayName = "Playhead";
+
 export const PlayheadMemoed = memo(Playhead);

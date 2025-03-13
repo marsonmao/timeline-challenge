@@ -41,4 +41,6 @@ export const TrackList = forwardRef<HTMLDivElement, TrackListProps>(
   }
 );
 
+TrackList.displayName = "TrackList";
+
 export const TrackListMemoed = memo(TrackList);

@@ -5,6 +5,7 @@ export const RenderTracker = ({ dataTestId }: { dataTestId: string }) => {
     return null;
   }
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const renderCount = useRef(0);
 
   ++renderCount.current;

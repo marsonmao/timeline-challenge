@@ -71,16 +71,20 @@ export function NumberInput({
   const [hasError, setHasError] = useState(false);
   const configLatest = useLatest(config);
   const onChangeLatest = useLatest(onChange);
+  const validatorLatest = useLatest(validator);
 
-  const confirmLocalValue = useCallback((localValue: string) => {
-    const { result: validatedValue } = validator(
-      parseFloat(localValue),
-      configLatest.current
-    );
-    setLocalValue(validatedValue.toString());
-    setHasError(false);
-    onChangeLatest.current(validatedValue);
-  }, []);
+  const confirmLocalValue = useCallback(
+    (localValue: string) => {
+      const { result: validatedValue } = validatorLatest.current(
+        parseFloat(localValue),
+        configLatest.current
+      );
+      setLocalValue(validatedValue.toString());
+      setHasError(false);
+      onChangeLatest.current(validatedValue);
+    },
+    [configLatest, onChangeLatest, validatorLatest]
+  );
 
   const selectInputText = useCallback(() => {
     inputElement.current?.select();
@@ -98,14 +102,14 @@ export function NumberInput({
       } else {
         setLocalValue(e.target.value);
 
-        const { hasError } = validator(
+        const { hasError } = validatorLatest.current(
           parseFloat(e.target.value),
           configLatest.current
         );
         setHasError(hasError);
       }
     },
-    [selectInputText, confirmLocalValue]
+    [selectInputText, confirmLocalValue, configLatest, validatorLatest]
   );
 
   const handleFocus = useCallback(() => {
